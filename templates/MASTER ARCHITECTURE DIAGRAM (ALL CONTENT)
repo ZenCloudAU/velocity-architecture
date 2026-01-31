@@ -1,0 +1,77 @@
+1. MASTER ARCHITECTURE DIAGRAM (ALL CONTENT)
+
+⚠️ This is very large. It is meant as a “full knowledge map” for architecture teams / CoE.
+Paste it into Mermaid Live Editor for best viewing: https://mermaid.live
+
+mindmap
+  root((Cloud Security Controls – Complete Map))
+
+    %% =============================
+    %% SECURITY CONTROLS CATEGORIES
+    %% =============================
+    Security_Controls_in_Cloud_Environment
+      End_User
+        MFA
+        SSO
+        Password_Policies
+      Application
+        WAF
+        API_Gateway
+        TLS
+      Compute_Instance
+        Hardening
+        IAM_Roles
+        Patching
+      Network
+        VPC
+        Security_Groups
+        DDOS_Protection
+      Data
+        Encryption
+        Backups
+        Classification
+      Management_Identity
+        IAM
+        Resource_Policies
+        SCPs
+      Monitoring_Audit
+        Logging
+        Alerts
+      Physical_Infrastructure
+        Data_Centers
+        Hardware
+
+    %% =============================
+    %% COMPUTE / HOST LAYER SECURITY
+    %% =============================
+    Compute_Host_Layer_Security
+      Container_Runtime_Security
+      Hardened_OS_AMI
+      IAM_Roles
+      Instance_Metadata_v2
+      AWS_Inspector
+      SSM_Patch_Manager
+      RAV_Agents
+      Resource_Based_Policies
+
+    %% =============================
+    %% END USER / ACCESS LAYER SECURITY
+    %% =============================
+    End_User_Access_Layer_Security
+      MFA
+        Multi_Factor_Authentication
+        Passwordless_Auth
+      Single_Sign_On
+        Identity_Broker
+        Central_Access_Point
+      Role_Based_Access_Control
+        Granular_Permission_Sets
+        Least_Privilege
+      Conditional_Access
+        Network_Location
+        Device_Type
+        Risk_Based
+      Strong_Password_Policies
+      Endpoint_Hardening
+
+    %%
