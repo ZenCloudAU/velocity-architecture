@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use or reference this framework, please cite it as below."
+type: software
+title: "Velocity Architecture Framework™"
+abstract: >
+  A formally specified architecture description framework conformant with
+  ISO/IEC/IEEE 42010:2022. A decision governance framework for enterprise
+  and solution architecture, and for organisational leadership. Establishes
+  six architecture viewpoints, eighteen correspondence rules, and a foundation
+  layer grounded in the epistemology of architectural decision-making.
+authors:
+  - family-names: Myint
+    given-names: Phil
+    affiliation: "ZenCloud Global Consultants"
+    email: phil@myintenterprises.com
+    orcid: ""
+version: "1.0"
+date-released: "2026-01-01"
+url: "https://github.com/ZenCloudAU/velocity-architecture"
+repository-code: "https://github.com/ZenCloudAU/velocity-architecture"
+license: "CC-BY-NC-SA-4.0"
+keywords:
+  - architecture framework
+  - enterprise architecture
+  - decision governance
+  - ISO 42010
+  - solution architecture
+  - organisational leadership
+  - decision velocity
+  - architecture description framework
+identifiers:
+  - type: url
+    value: "https://github.com/ZenCloudAU/velocity-architecture"
+    description: "Primary repository"
