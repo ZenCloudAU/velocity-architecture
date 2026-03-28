@@ -24,9 +24,7 @@ The VAF's central claim is simple: **architecture exists to create clarity that 
 **Velocity Architecture Framework™** is a trademark filed under Class 42, ZenCloud Consulting.  
 © 2026 Phil Myint / ZenCloud Global Consultants. All rights reserved.
 
-This framework is licensed under **CC BY-NC-SA 4.0** — free for non-commercial use with attribution; commercial use requires a separate licence. The trademark name, abbreviation VAF, and all named instruments are protected IP.
-
-See [LICENSE.md](LICENSE.md) for full terms. For commercial licensing: phil@myintenterprises.com
+This repository is published for reference and professional use. See [LICENSE](LICENSE) for terms.
 
 ---
 
@@ -157,5 +155,4 @@ If it did not, it is not architecture.
 ---
 
 *Velocity Architecture Framework™ — © 2026 Phil Myint / ZenCloud Global Consultants*  
-*ISO/IEC/IEEE 42010:2022 Conformant | TM Class 42, ZenCloud Consulting*  
-*Licensed under CC BY-NC-SA 4.0 | Commercial use requires written permission*
+*ISO/IEC/IEEE 42010:2022 Conformant | TM Class 42, ZenCloud Consulting*
