@@ -1,0 +1,19 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY tsconfig.json ./
+COPY app ./app
+
+RUN npm install -g typescript ts-node
+RUN npm run build
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
+
+EXPOSE 3000
+
+CMD ["node", "dist/app/app.js"]
