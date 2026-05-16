@@ -38,20 +38,21 @@ class Orchestrator {
         return state;
       }
 
-      // Phase 2: Generation
+      // Phase 2: Generation (parallel)
       logger.info({ requestId: request.id, artefactsNeeded: plan.artefactsNeeded }, 'Phase: Generation');
       state.phase = 'generation';
 
-      for (const artefactType of plan.artefactsNeeded) {
-        try {
-          const artefact = await this.generateArtefact(request, artefactType);
-          if (artefact) {
-            state.artefacts.push(artefact);
+      const results = await Promise.all(
+        plan.artefactsNeeded.map(async (artefactType) => {
+          try {
+            return await this.generateArtefact(request, artefactType);
+          } catch (error) {
+            state.errors.push(`Generation failed for ${artefactType}: ${error instanceof Error ? error.message : String(error)}`);
+            return null;
           }
-        } catch (error) {
-          state.errors.push(`Generation failed for ${artefactType}: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      }
+        })
+      );
+      state.artefacts = results.filter((a): a is NonNullable<typeof a> => a !== null);
 
       if (state.artefacts.length === 0) {
         state.phase = 'failed';
