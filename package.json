@@ -2,11 +2,11 @@
   "name": "vaf-agentic-architect-v2",
   "version": "2.0.0",
   "description": "Claude-powered agentic Enterprise Architect. Generates EA artefacts using Velocity Architecture Framework rules.",
-  "main": "dist/app.js",
+  "main": "dist/app/app.js",
   "scripts": {
     "dev": "ts-node app/app.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/app/app.js",
     "test": "jest",
     "lint": "eslint app/",
     "format": "prettier --write app/"
