@@ -37,11 +37,11 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Azure login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Delete existing container (required to update ports)
+      - name: Delete existing container (required to update image)
         run: |
           az container delete \
             --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -60,17 +60,17 @@ jobs:
             --registry-login-server ${{ env.REGISTRY }} \
             --registry-username ${{ github.actor }} \
             --registry-password "$GH_TOKEN_VAL" \
-            --ports 80 3000 \
+            --ports 80 \
             --ip-address Public \
             --dns-name-label vaf-architect \
             --location ${{ env.LOCATION }} \
             --os-type Linux \
             --cpu 1 \
             --memory 1.5 \
-            --environment-variables \
-                ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
-                GH_TOKEN="$GH_TOKEN_VAL" \
-                NODE_ENV=production \
+            --environment-variables NODE_ENV=production \
+            --secure-environment-variables \
+                "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" \
+                "VAF_GITHUB_TOKEN=$GH_TOKEN_VAL" \
             --restart-policy Always
 
       - name: Show container FQDN
