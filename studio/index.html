@@ -247,6 +247,12 @@ select.portal-inp option{background:var(--surface)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── BACK TO VAF LINKS ── */
+.back-to-vaf{display:block;text-align:center;margin-top:.75rem;font-size:.62rem;color:var(--text3);text-decoration:none;letter-spacing:.08em;transition:color .2s}
+.back-to-vaf:hover{color:var(--gold)}
+.persona-exit{font-size:.62rem;color:var(--text3);text-decoration:none;letter-spacing:.08em;transition:color .2s;flex-shrink:0}
+.persona-exit:hover{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -286,12 +292,16 @@ const CONFIG = {
     <div class="auth-err" id="authErr"></div>
   </div>
   <div class="auth-footer" id="authFooter">ZenCloud Global Consultants © 2026 · NDA Protected Engagements</div>
+  <a href="https://velocityarchitectureframework.com" class="back-to-vaf">← Back to velocityarchitectureframework.com</a>
 </div>
 
 <!-- PERSONA SELECTOR -->
 <div id="personaScreen">
   <div class="persona-header">
-    <div class="persona-header-logo" id="personaLogo">ZAF Studio</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="persona-header-logo" id="personaLogo">ZAF Studio</div>
+      <a href="https://velocityarchitectureframework.com" class="persona-exit">← Exit to VAF</a>
+    </div>
     <div class="persona-header-title">Who are you working with today?</div>
     <div class="persona-header-sub">Select the profile that best matches the person you are working with or your own role. The ZAF Decision Engine adapts its language, questions, and report format to match.</div>
   </div>
@@ -324,9 +334,10 @@ const CONFIG = {
       <div class="setup-field"><label class="setup-lbl">NDA reference</label><input class="inp" id="sNDA" placeholder="NDA document reference or date"></div>
       <div class="setup-field"><label class="setup-lbl">Engagement date</label><input class="inp" id="sDate" type="date"></div>
     </div>
-    <div style="display:flex;gap:.75rem;margin-top:.5rem">
+    <div style="display:flex;gap:.75rem;margin-top:.5rem;align-items:center">
       <button class="btn-primary" onclick="saveSetup()">Save & Open Studio →</button>
       <button class="btn-ghost" onclick="backToPersona()">← Back</button>
+      <a href="https://velocityarchitectureframework.com" class="back-to-vaf" style="margin-top:0">← Exit to VAF</a>
     </div>
   </div>
 </div>

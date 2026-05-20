@@ -362,7 +362,7 @@
             h1 {
                 font-size: 1.8rem;
             }
-            
+
             .grid {
                 grid-template-columns: 1fr;
             }
@@ -372,16 +372,90 @@
                 overflow-x: auto;
             }
         }
+
+        html { scroll-behavior: smooth; }
+
+        /* ── STICKY NAV ── */
+        .dash-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 200;
+            height: 48px;
+            background: rgba(15,23,42,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 2rem;
+        }
+        .dash-nav-brand {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .dash-nav-brand:hover { opacity: 0.7; }
+        .dash-nav-links {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+        }
+        .dash-nav-links a {
+            font-family: var(--font-body);
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            transition: color 0.2s;
+            text-transform: uppercase;
+        }
+        .dash-nav-links a:hover { color: var(--text-primary); }
+        .dash-nav-links a.active { color: var(--accent-blue); }
+        @media (max-width: 768px) {
+            .dash-nav-links { display: none; }
+        }
+        body { padding-top: 48px; }
+
+        /* ── FOOTER LINK ── */
+        .footer-home {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 0.72rem;
+            color: var(--accent-orange);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .footer-home:hover { opacity: 1; }
     </style>
 </head>
 <body>
+<nav class="dash-nav" id="dashNav">
+    <a href="https://velocityarchitectureframework.com" class="dash-nav-brand">← VAF</a>
+    <div class="dash-nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#data-flow">Data Flow</a>
+        <a href="#deployment">Deployment</a>
+        <a href="#best-practices">Best Practices</a>
+        <a href="#tech-stack">Stack</a>
+    </div>
+</nav>
+
     <div class="container">
         <header>
             <h1>VAF Agentic Architect v2</h1>
             <p class="subtitle">Architecture Reference & System Documentation</p>
         </header>
 
-        <div class="stats">
+        <div class="stats" id="overview">
             <div class="stat-box">
                 <div class="stat-number">9</div>
                 <div class="stat-label">Best Practices</div>
@@ -400,7 +474,7 @@
             </div>
         </div>
 
-        <div class="flow-section">
+        <div class="flow-section" id="architecture">
             <h2 class="flow-title">System Architecture</h2>
             <div class="grid">
                 <div class="card">
@@ -479,7 +553,7 @@
             </div>
         </div>
 
-        <div class="flow-section">
+        <div class="flow-section" id="data-flow">
             <h2 class="flow-title">Data Flow</h2>
             <div class="flow-diagram">Agent reads KB → applies framework rules 
 → routes via orchestrator → executes via GitHub API 
@@ -487,7 +561,7 @@
             </div>
         </div>
 
-        <div class="flow-section">
+        <div class="flow-section" id="deployment">
             <h2 class="flow-title">Deployment Architecture</h2>
             <table class="deployment-matrix">
                 <thead>
@@ -533,7 +607,7 @@
             </table>
         </div>
 
-        <div class="flow-section">
+        <div class="flow-section" id="best-practices">
             <h2 class="flow-title">Nine Production Best Practices</h2>
             <div class="best-practices">
                 <h3>Applied to VAF</h3>
@@ -551,7 +625,7 @@
             </div>
         </div>
 
-        <div class="flow-section">
+        <div class="flow-section" id="tech-stack">
             <h2 class="flow-title">Technology Stack</h2>
             <div class="grid">
                 <div class="card">
@@ -628,10 +702,31 @@
             <p>VAF Agentic Architect v2 | Architecture Dashboard</p>
             <p>Generated for ZenCloud Global Consultants | Platform-Agnostic, Production-Ready</p>
             <p style="margin-top: 10px; font-size: 0.75rem; color: #64748b;">Cloud-agnostic deployment. Phase 1: your tenant. Phase 2: multi-tenant via env vars.</p>
+            <a href="https://velocityarchitectureframework.com" class="footer-home">← Back to Velocity Architecture Framework</a>
         </footer>
     </div>
 
     <script>
+        // Active nav link on scroll
+        (function() {
+            const navLinks = document.querySelectorAll('.dash-nav-links a');
+            const sections = ['overview','architecture','data-flow','deployment','best-practices','tech-stack']
+                .map(id => document.getElementById(id)).filter(Boolean);
+
+            function onScroll() {
+                const scrollY = window.scrollY + 80;
+                let current = null;
+                for (const sec of sections) {
+                    if (sec.offsetTop <= scrollY) current = sec.id;
+                }
+                navLinks.forEach(a => {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+                });
+            }
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        })();
+
         function exportJSON() {
             const architecture = {
                 name: "VAF Agentic Architect v2",
