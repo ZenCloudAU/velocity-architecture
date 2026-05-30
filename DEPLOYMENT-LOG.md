@@ -10,3 +10,12 @@
 **Known issues:** None.
 
 ---
+
+## 2026-05-31
+
+**Version:** 4.0.0
+**Files changed:** .claude/settings.local.json
+**Summary:** Session end.
+**Known issues:** None.
+
+---
