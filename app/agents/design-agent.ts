@@ -1,126 +1,63 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { EARequest, Artefact, VAFFramework } from '../types/index';
+import Anthropic from '@anthropic-ai/sdk';
+import { loadVAFFramework } from '../kb-loader';
+import { EARequest, ArtefactType } from '../types/index';
 import { logger } from '../logger';
 
 const client = new Anthropic();
 
+// Handles: adr, domain-model, application-blueprint, and legacy 'design'
 export const designAgent = {
-  async generate(request: EARequest, framework: VAFFramework): Promise<Artefact> {
-    const startTime = Date.now();
+  async generate(req: EARequest, type: ArtefactType, label: string): Promise<string> {
+    const fw = await loadVAFFramework();
+    logger.info({ type, label }, 'Design agent generating');
 
-    const systemPrompt = buildSystemPrompt(framework);
+    const typeInstructions: Record<string, string> = {
+      'adr': `Generate a comprehensive VP3 Architecture Decision Record (ADR).
+Structure: Decision Title (verb+noun), Status, Context (what required a decision), Decision (one sentence), Options Considered (minimum 3), Reasoning (why this option), Consequences (what is now binding), Fitness Functions (how we know if this holds), Related Decisions.
+Be forensic. Record the actual reasoning, not a summary of it.`,
 
-    try {
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate an Architecture Decision Record (ADR) (VP3) for the following technical architecture challenge:
+      'domain-model': `Generate a Domain Model artefact — a structured vocabulary alignment for the domain.
+Structure: Executive Summary, Key Concepts (name + definition for each), Concept Relationships, Bounded Contexts, Contested Definitions (where teams use the same word differently), Agreed Definitions (resolved in this artefact), Events and Commands, Domain Rules, Integration Points.
+Write definitions in plain language. Name every concept precisely.`,
 
-Topic: ${request.topic}
+      'application-blueprint': `Generate an Application Blueprint artefact for the target state architecture.
+Structure: Executive Summary, Current State Assessment, Target State Architecture, Application Components (with responsibilities and interfaces), Key Design Decisions (as mini-ADRs), Technology Choices, Integration Pattern, Data Flow, Security Controls, Deployment Model, Migration Path.
+Be specific about what changes and in what sequence.`,
 
-Context: ${request.context || 'No additional context provided.'}
+      'design': `Generate a VP3 Architecture Decision Record following the VAF framework specification.
+Structure: Title, Status, Context, Decision, Options, Reasoning, Consequences, Related ADRs.`,
+    };
 
-Constraints: ${request.constraints?.join(', ') || 'No constraints provided.'}
+    const instruction = typeInstructions[type] || typeInstructions['design'];
 
-Requirements:
-1. Follow the ISO 42010 ADR structure exactly
-2. Use technical, precise, implementation-focused tone
-3. Include: Decision Context, Decision, Rationale, Consequences, Fitness Functions
-4. Align with governance (VP1) and strategy (VP2) if provided
-5. Reference VAF concepts (Truth, Integrity Gap, Compliance)
-6. Format as valid Markdown
-7. Do not include preamble or explanation; output the artefact only`,
-          },
-        ],
-      });
+    const systemPrompt = `You are the VAF Agentic Architect — an ISO 42010:2022 conformant enterprise architecture agent.
+You produce precise, forensic artefacts. Every decision is recorded with its full reasoning.
+Framework Spec:
+${fw.spec}
+VP3 Truth Viewpoint:
+${fw.viewpoints.vp3}
+Correspondence Rules:
+${fw.correspondenceRules}
+Example:
+${fw.examples.design}`;
 
-      const content = response.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from Claude');
-      }
+    const userPrompt = `${instruction}
 
-      const artefact: Artefact = {
-        id: `${request.id}-design`,
-        type: 'design',
-        content: content.text,
-        metadata: {
-          requestId: request.id,
-          generatedBy: 'design-agent',
-          timestamp: new Date(),
-          vafVersion: '2.0.0',
-          tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-          validationPassed: false,
-        },
-      };
+Topic: ${req.topic}
+${req.context ? `Context: ${req.context}` : ''}
+${req.constraints?.length ? `Constraints: ${req.constraints.join(', ')}` : ''}
 
-      const duration = Date.now() - startTime;
-      logger.info(
-        {
-          requestId: request.id,
-          type: artefact.type,
-          tokens: artefact.metadata.tokensUsed,
-          durationMs: duration,
-        },
-        'Design artefact generated'
-      );
+Produce the complete ${label} now. Use Markdown formatting. Minimum 800 words. Be specific to the topic.`;
 
-      return artefact;
-    } catch (error) {
-      logger.error(
-        {
-          requestId: request.id,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        'Design artefact generation failed'
-      );
-      throw error;
-    }
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const content = response.content[0];
+    if (content.type !== 'text') throw new Error('Unexpected response type');
+    return content.text;
   },
 };
-
-function buildSystemPrompt(framework: VAFFramework): string {
-  return `You are the Design Agent for the Velocity Architecture Framework (VAF) v2.
-
-Your role: Generate technical artefacts (Architecture Decision Records — VP3) that establish implementation decisions and fitness functions.
-
-## VAF Framework Context
-
-### Framework Specification
-${framework.spec.slice(0, 5000)}...
-
-### Viewpoint 3: Truth (Design)
-${framework.viewpoints.vp3?.slice(0, 3000) || 'Not available'}...
-
-### Correspondence Rules (Must Comply)
-${framework.correspondenceRules.slice(0, 3000)}...
-
-### Foundation Layer (Guiding Principles)
-${framework.foundation.slice(0, 2000)}...
-
-### Reference Example
-${framework.examples.design?.slice(0, 2000) || 'Not available'}...
-
-## Your Constraints
-
-1. **Tone:** Technical, precise, implementation-focused. Ground in facts.
-2. **Structure:** Always follow VP3 (ADR) structure.
-3. **VAF Concepts:** Apply Truth, Integrity Gap, Compliance, Fitness Functions.
-4. **Alignment:** Must align with governance (VP1) AND strategy (VP2) when available.
-5. **Output:** Valid Markdown only. No preamble. The artefact is your output.
-6. **Quality:** Match the style of the reference example.
-
-## Generation Rules
-
-- Define decision context precisely (what problem are we solving?).
-- State the decision clearly (what are we choosing?).
-- Provide detailed rationale (why this decision?).
-- Identify consequences (what changes, costs, risks?).
-- Define fitness functions (how do we measure success?).
-- Reference implementation constraints (technical, organizational).
-- If alignment with governance or strategy is impossible, flag the contradiction.
-- If you cannot generate a compliant artefact, explain why and fail loudly.`;
-}

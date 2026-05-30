@@ -1,1381 +1,1134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VAF Agentic Architect — Velocity Architecture Framework</title>
-<meta name="description" content="Generate decision-ready enterprise architecture artefacts from a single brief. VAF v2, aligned to ISO/IEC/IEEE 42010:2022.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
-<style>
-:root {
-  --bg: #F1F5F9;
-  --surface: #FFFFFF;
-  --surface-2: #F8FAFC;
-  --border: #E2E8F0;
-  --border-2: #CBD5E1;
-  --text: #0F172A;
-  --text-2: #475569;
-  --text-3: #94A3B8;
-  --orange: #E8630A;
-  --orange-hover: #CC5508;
-  --orange-subtle: #FFF7ED;
-  --orange-border: #FED7AA;
-  --success: #16A34A;
-  --success-subtle: #F0FDF4;
-  --success-border: #BBF7D0;
-  --error: #DC2626;
-  --error-subtle: #FEF2F2;
-  --error-border: #FECACA;
-  --r: 10px;
-  --shadow: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
-  --shadow-md: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--bg); }
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VAF Agentic Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --surface2: #181c24;
+      --border: #1e2330;
+      --border2: #252c3a;
+      --text: #e8ecf4;
+      --muted: #6b7385;
+      --subtle: #3a4152;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --cat1: #4f8ef7;
+      --cat2: #2ec4a0;
+      --cat3: #f59e42;
+      --cat4: #a855f7;
+      --danger: #f05454;
+      --success: #3ecf8e;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
 
-/* HEADER */
-.header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  box-shadow: var(--shadow);
-}
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-mark {
-  width: 34px; height: 34px;
-  background: var(--orange);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.logo-mark svg { width: 18px; height: 18px; fill: #fff; }
-.logo-text { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-.logo-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; font-family: 'JetBrains Mono', monospace; }
-.header-right { display: flex; align-items: center; gap: 16px; }
-.header-meta { font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; display: none; }
-.status {
-  display: flex; align-items: center; gap: 7px;
-  color: var(--success); font-size: 12px; font-weight: 500;
-}
-.status-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--success);
-  animation: pulse 2.5s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* CONTAINER */
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+    html { scroll-behavior: smooth; }
 
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 52px 0 36px;
-}
-.hero-kicker {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600;
-  color: var(--orange);
-  text-transform: uppercase; letter-spacing: 0.10em;
-  font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 18px;
-  background: var(--orange-subtle);
-  border: 1px solid var(--orange-border);
-  border-radius: 20px; padding: 5px 16px;
-}
-.hero-headline {
-  font-size: 34px; font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.03em; line-height: 1.2;
-  max-width: 680px; margin: 0 auto 16px;
-}
-.hero-sub {
-  font-size: 15px; color: var(--text-2);
-  max-width: 580px; margin: 0 auto 28px;
-  line-height: 1.7;
-}
-.value-badges {
-  display: flex; justify-content: center;
-  gap: 8px; flex-wrap: wrap;
-}
-.value-badge {
-  padding: 6px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  font-size: 12px; font-weight: 500;
-  color: var(--text-2);
-  display: flex; align-items: center; gap: 7px;
-  box-shadow: var(--shadow);
-}
-.value-badge-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--orange); flex-shrink: 0;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-/* STATS */
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-.stat {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 16px 20px;
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.2s;
-}
-.stat:hover { box-shadow: var(--shadow-md); }
-.stat-label {
-  font-size: 10px; font-weight: 600; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;
-}
-.stat-value { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-.stat-value.orange { color: var(--orange); }
-.stat-sub { font-size: 10px; color: var(--text-3); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-/* WORKSPACE */
-.workspace {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 16px;
-  margin-bottom: 16px;
-  align-items: start;
-}
-.workspace-side {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-/* CARD */
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 24px;
-  box-shadow: var(--shadow);
-}
-.card-title {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  margin-bottom: 18px;
-  display: flex; align-items: center; gap: 8px;
-  letter-spacing: -0.01em;
-}
-.card-title svg { width: 15px; height: 15px; color: var(--text-3); flex-shrink: 0; }
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
 
-/* EXAMPLES */
-.examples-label {
-  font-size: 11px; font-weight: 600; color: var(--text-3);
-  margin-bottom: 10px;
-}
-.examples-grid { display: flex; gap: 6px; flex-wrap: wrap; }
-.example-btn {
-  padding: 6px 12px; font-size: 12px; font-weight: 500;
-  color: var(--text-2); background: var(--surface-2);
-  border: 1px solid var(--border); border-radius: 6px;
-  cursor: pointer; font-family: 'Inter', sans-serif;
-  transition: all 0.15s;
-}
-.example-btn:hover { border-color: var(--orange-border); color: var(--orange); background: var(--orange-subtle); }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
 
-/* FORM */
-label {
-  display: block; font-size: 13px; font-weight: 600;
-  color: var(--text-2);
-  margin-bottom: 7px; letter-spacing: -0.01em;
-}
-input, textarea, select {
-  width: 100%; padding: 11px 14px;
-  border: 1.5px solid var(--border-2); border-radius: 7px;
-  font-size: 14px; color: var(--text);
-  background: var(--surface); font-family: 'Inter', sans-serif;
-  transition: border-color 0.15s, box-shadow 0.15s; outline: none;
-  line-height: 1.5;
-}
-input::placeholder, textarea::placeholder { color: var(--text-3); font-size: 13px; }
-input:focus, textarea:focus, select:focus {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px var(--orange-subtle);
-}
-textarea { resize: vertical; min-height: 120px; }
-.form-row { margin-bottom: 20px; }
+    .logo-sub {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
-/* CHIPS */
-.chips-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.chips-label label { margin-bottom: 0; }
-.chips-clear {
-  font-size: 11px; color: var(--text-3); cursor: pointer;
-  font-family: 'Inter', sans-serif; font-weight: 500;
-  background: none; border: none; padding: 0;
-  transition: color 0.15s;
-}
-.chips-clear:hover { color: var(--text-2); }
-.chips-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.chip {
-  padding: 5px 13px; border: 1.5px solid var(--border);
-  border-radius: 14px; font-size: 12px; font-weight: 500;
-  color: var(--text-3); background: var(--surface-2);
-  cursor: pointer; transition: all 0.15s; user-select: none;
-}
-.chip:hover { border-color: var(--orange-border); color: var(--text-2); background: var(--orange-subtle); }
-.chip.on { background: var(--orange-subtle); border-color: var(--orange); color: var(--orange); }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
 
-/* TOGGLES */
-.toggles {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-.toggle {
-  padding: 11px 13px;
-  border: 1.5px solid var(--border); border-radius: 8px;
-  background: var(--surface-2); cursor: pointer;
-  transition: all 0.15s; user-select: none;
-  display: flex; flex-direction: column; align-items: flex-start;
-}
-.toggle:hover { border-color: var(--orange-border); background: var(--orange-subtle); }
-.toggle.on { background: var(--orange-subtle); border-color: var(--orange); }
-.toggle-label { font-size: 12px; font-weight: 600; color: var(--text-2); line-height: 1.3; }
-.toggle.on .toggle-label { color: var(--orange); }
-.toggle-desc {
-  font-size: 10px; color: var(--text-3); margin-top: 4px;
-  line-height: 1.4; font-weight: 400;
-}
-.toggle.on .toggle-desc { color: #C55E08; opacity: 0.75; }
+    .chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      letter-spacing: 0.5px;
+    }
 
-/* PACKS */
-.packs-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-.packs-label {
-  font-size: 11px; font-weight: 600; color: var(--text-3);
-  margin-bottom: 9px;
-}
-.packs-grid { display: flex; gap: 6px; flex-wrap: wrap; }
-.pack-btn {
-  padding: 5px 11px; font-size: 11px; font-weight: 500;
-  color: var(--text-2); background: var(--surface);
-  border: 1.5px solid var(--border); border-radius: 6px;
-  cursor: pointer; font-family: 'Inter', sans-serif;
-  transition: all 0.15s;
-}
-.pack-btn:hover { border-color: var(--border-2); color: var(--text); background: var(--surface-2); }
-.pack-btn.active { background: var(--orange-subtle); border-color: var(--orange); color: var(--orange); }
+    .chip.live {
+      border-color: var(--success);
+      color: var(--success);
+    }
 
-/* GENERATE BUTTON */
-.generate-btn {
-  width: 100%; padding: 14px;
-  background: var(--orange); color: #fff;
-  border: none; border-radius: 8px;
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 8px; font-family: 'Inter', sans-serif;
-  transition: background 0.15s, transform 0.1s;
-  letter-spacing: -0.01em;
-  box-shadow: 0 2px 4px rgba(232,99,10,0.25), 0 6px 16px rgba(232,99,10,0.12);
-}
-.generate-btn:hover { background: var(--orange-hover); }
-.generate-btn:active { transform: scale(0.99); }
-.generate-btn:disabled { background: var(--border-2); color: var(--text-3); cursor: not-allowed; transform: none; box-shadow: none; }
+    /* ── MAIN LAYOUT ── */
+    .main {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      min-height: calc(100vh - 61px);
+    }
 
-/* PROGRESS */
-.progress { display: none; margin-top: 16px; }
-.progress.show { display: block; }
-.progress-bar-bg { background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; }
-.progress-bar {
-  background: var(--orange); height: 4px; border-radius: 4px;
-  width: 0%; transition: width 0.5s;
-}
-.progress-text {
-  font-size: 11px; color: var(--text-3); margin-top: 8px;
-  text-align: center; font-family: 'JetBrains Mono', monospace;
-}
+    /* ── SIDEBAR ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 61px;
+      height: calc(100vh - 61px);
+      overflow-y: auto;
+    }
 
-/* ARTEFACTS OUTPUT */
-.artefacts-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.artefacts-header .card-title { margin-bottom: 0; }
-.copy-all-btn {
-  padding: 6px 14px; font-size: 12px; font-weight: 500;
-  color: var(--text-2); background: var(--surface-2);
-  border: 1.5px solid var(--border); border-radius: 6px;
-  cursor: pointer; font-family: 'Inter', sans-serif;
-  transition: all 0.15s;
-  display: none; align-items: center; gap: 5px;
-}
-.copy-all-btn.show { display: inline-flex; }
-.copy-all-btn:hover { background: var(--border); color: var(--text); }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-/* ARTEFACT LIST */
-.artefact-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px; border-radius: 8px;
-  background: var(--surface-2); border: 1px solid var(--border);
-  margin-bottom: 8px; gap: 12px;
-}
-.artefact-item:last-child { margin-bottom: 0; }
-.artefact-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-.artefact-icon {
-  width: 38px; height: 38px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; font-size: 16px; border: 1px solid var(--border);
-}
-.icon-gov { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.2); }
-.icon-str { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
-.icon-des { background: rgba(232,99,10,0.08); border-color: rgba(232,99,10,0.2); }
-.icon-vel { background: rgba(202,138,4,0.10); border-color: rgba(202,138,4,0.2); }
-.icon-rhy { background: rgba(147,51,234,0.08); border-color: rgba(147,51,234,0.2); }
-.icon-pra { background: rgba(13,148,136,0.08); border-color: rgba(13,148,136,0.2); }
-.artefact-name {
-  font-size: 13px; font-weight: 600; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  letter-spacing: -0.01em;
-}
-.artefact-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
-.artefact-actions { display: flex; gap: 5px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-/* BUTTONS SM */
-.btn-sm {
-  padding: 6px 12px; font-size: 11px; font-weight: 500;
-  border: 1.5px solid var(--border); border-radius: 6px;
-  color: var(--text-2); background: var(--surface);
-  cursor: pointer; font-family: 'Inter', sans-serif;
-  transition: all 0.15s; text-decoration: none;
-  display: inline-flex; align-items: center; gap: 4px;
-}
-.btn-sm:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-2); }
-.btn-sm.github { color: var(--orange); border-color: var(--orange-border); background: var(--orange-subtle); }
-.btn-sm.github:hover { background: #FEE4C4; border-color: var(--orange); }
+    .form-label {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
 
-/* EMPTY STATE */
-.empty { text-align: center; padding: 52px 24px; }
-.empty-icon { font-size: 32px; margin-bottom: 14px; }
-.empty-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; }
-.empty-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; max-width: 440px; margin: 0 auto 20px; }
-.empty-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.empty-action {
-  padding: 8px 16px; font-size: 12px; font-weight: 500;
-  border: 1.5px solid var(--border); border-radius: 7px;
-  color: var(--text-2); background: var(--surface);
-  cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
-}
-.empty-action:hover { border-color: var(--orange-border); color: var(--orange); background: var(--orange-subtle); }
-.empty-action.primary { background: var(--orange); border-color: var(--orange); color: #fff; font-weight: 600; }
-.empty-action.primary:hover { background: var(--orange-hover); }
+    .form-input,
+    .form-textarea {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 10px 14px;
+      transition: border-color 0.15s;
+      width: 100%;
+      resize: vertical;
+    }
 
-/* ALERTS */
-.alert {
-  padding: 12px 16px; border-radius: 7px; font-size: 13px;
-  margin-bottom: 16px; display: none; line-height: 1.5;
-}
-.alert.show { display: block; }
-.alert.error { background: var(--error-subtle); border: 1px solid var(--error-border); color: var(--error); }
-.alert.success { background: var(--success-subtle); border: 1px solid var(--success-border); color: var(--success); }
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+    }
 
-/* TRUST SECTION */
-.trust-section {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 28px; margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-.trust-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; margin-bottom: 8px; }
-.trust-sub { font-size: 14px; color: var(--text-2); margin-bottom: 22px; line-height: 1.65; max-width: 640px; }
-.trust-points { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.trust-point {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 16px; background: var(--surface-2);
-  border: 1px solid var(--border); border-radius: 9px;
-}
-.trust-point-icon {
-  width: 30px; height: 30px; border-radius: 7px;
-  background: var(--orange-subtle); border: 1.5px solid var(--orange-border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0; color: var(--orange);
-  font-weight: 700;
-}
-.trust-point-text { font-size: 13px; color: var(--text-2); line-height: 1.6; }
-.trust-point-text strong { color: var(--text); font-weight: 600; }
+    .form-input::placeholder,
+    .form-textarea::placeholder { color: var(--subtle); }
 
-/* USE CASES */
-.use-cases-section {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 24px 28px; margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-.use-cases-title {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  margin-bottom: 14px; letter-spacing: -0.01em;
-}
-.use-cases-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.use-case {
-  padding: 10px 13px; background: var(--surface-2);
-  border: 1px solid var(--border); border-radius: 7px;
-  font-size: 12px; color: var(--text-2); font-weight: 500;
-  display: flex; align-items: center; gap: 8px;
-}
-.use-case-arrow { color: var(--orange); font-size: 12px; flex-shrink: 0; }
+    /* Selected agents summary */
+    .selected-summary {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      min-height: 48px;
+    }
 
-/* MODAL */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
-  z-index: 50; align-items: flex-start; justify-content: center;
-  padding: 40px 16px; overflow-y: auto;
-}
-.modal-overlay.show { display: flex; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; width: 100%; max-width: 840px;
-  max-height: 82vh; display: flex; flex-direction: column;
-  box-shadow: 0 20px 60px rgba(15,23,42,0.18), 0 4px 12px rgba(15,23,42,0.06);
-}
-.modal-header {
-  padding: 18px 24px 16px; border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  background: var(--surface-2); border-radius: 12px 12px 0 0;
-}
-.modal-title { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
-.modal-actions { display: flex; align-items: center; gap: 8px; }
-.modal-copy-btn {
-  padding: 6px 14px; font-size: 12px; font-weight: 500;
-  border: 1.5px solid var(--border-2); border-radius: 6px;
-  color: var(--text-2); background: var(--surface);
-  cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
-}
-.modal-copy-btn:hover { background: var(--border); color: var(--text); }
-.modal-close {
-  background: none; border: 1.5px solid var(--border); border-radius: 6px;
-  font-size: 16px; cursor: pointer; color: var(--text-3);
-  padding: 4px 8px; line-height: 1; transition: all 0.15s;
-}
-.modal-close:hover { color: var(--text); border-color: var(--border-2); background: var(--surface); }
-.modal-body { padding: 28px; overflow-y: auto; flex: 1; }
-.modal-body .md { font-size: 14px; line-height: 1.8; color: var(--text-2); }
-.modal-body .md h1 { font-size: 20px; font-weight: 700; color: var(--text); margin: 0 0 16px; letter-spacing: -0.02em; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
-.modal-body .md h2 { font-size: 15px; font-weight: 700; color: var(--text); margin: 28px 0 10px; letter-spacing: -0.01em; }
-.modal-body .md h3 { font-size: 13px; font-weight: 700; color: var(--orange); margin: 20px 0 8px; }
-.modal-body .md h4 { font-size: 12px; font-weight: 600; color: var(--text-3); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-.modal-body .md p { margin: 0 0 14px; }
-.modal-body .md ul, .modal-body .md ol { padding-left: 22px; margin: 0 0 14px; }
-.modal-body .md li { margin-bottom: 5px; }
-.modal-body .md strong { color: var(--text); font-weight: 600; }
-.modal-body .md em { color: var(--text-2); font-style: italic; }
-.modal-body .md code { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; color: var(--orange); }
-.modal-body .md pre { background: #F8FAFC; border: 1px solid var(--border); border-radius: 7px; padding: 16px 18px; margin: 0 0 16px; overflow-x: auto; }
-.modal-body .md pre code { background: none; border: none; padding: 0; color: var(--text); font-size: 12px; line-height: 1.7; }
-.modal-body .md blockquote { border-left: 3px solid var(--orange-border); background: var(--orange-subtle); margin: 0 0 14px; padding: 10px 16px; color: var(--text-2); border-radius: 0 6px 6px 0; }
-.modal-body .md table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 13px; }
-.modal-body .md th { background: var(--surface-2); color: var(--text); font-weight: 600; padding: 9px 14px; text-align: left; border: 1px solid var(--border); }
-.modal-body .md td { padding: 8px 14px; border: 1px solid var(--border); vertical-align: top; color: var(--text-2); }
-.modal-body .md tr:nth-child(even) td { background: var(--surface-2); }
-.modal-body .md hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-.modal-body .md a { color: var(--orange); text-decoration: none; }
-.modal-body .md a:hover { text-decoration: underline; }
-.modal-truncated { font-size: 11px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .selected-summary-label {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+    .selected-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
 
-/* FOCUS ACCESSIBILITY */
-:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+    .selected-tag {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: rgba(79,142,247,0.12);
+      border: 1px solid rgba(79,142,247,0.25);
+      color: var(--accent);
+    }
 
-/* ── ARCHITECTURE BOARD PACK ─────────────────────────────────────────────── */
-.board-pack-feature {
-  background: linear-gradient(135deg, #EEF2FF 0%, #E8EDFF 100%);
-  border: 1.5px solid #C7D2FE;
-  border-radius: var(--r);
-  padding: 18px 20px;
-}
-.board-pack-eyebrow {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
-  text-transform: uppercase; color: #6366F1;
-  font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;
-}
-.board-pack-title {
-  font-size: 13px; font-weight: 700; color: #312E81;
-  margin-bottom: 5px; letter-spacing: -0.01em;
-}
-.board-pack-desc {
-  font-size: 12px; color: #4338CA; line-height: 1.55; margin-bottom: 12px;
-}
-.board-pack-tags {
-  display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px;
-}
-.board-pack-tag {
-  font-size: 10px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
-  color: #4338CA; background: rgba(99,102,241,0.12);
-  border: 1px solid #C7D2FE; border-radius: 10px; padding: 2px 8px;
-}
-.board-pack-btn {
-  width: 100%; padding: 10px;
-  background: #4F46E5; color: #fff; border: none; border-radius: 7px;
-  font-size: 12px; font-weight: 700; cursor: pointer;
-  font-family: 'Inter', sans-serif; transition: background 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  letter-spacing: -0.01em;
-}
-.board-pack-btn:hover { background: #4338CA; }
-.board-pack-btn.selected { background: #059669; }
+    .selected-empty {
+      font-size: 11px;
+      color: var(--subtle);
+      font-style: italic;
+    }
 
-/* ── BRIEF QUALITY PANEL ─────────────────────────────────────────────────── */
-.quality-panel {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;
-}
-.quality-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
-}
-.quality-label {
-  font-size: 10px; font-weight: 700; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace;
-}
-.quality-badge {
-  font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 10px;
-}
-.quality-badge.needs-detail { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
-.quality-badge.good { background: var(--orange-subtle); color: var(--orange); border: 1px solid var(--orange-border); }
-.quality-badge.strong { background: var(--success-subtle); color: var(--success); border: 1px solid var(--success-border); }
-.quality-section { margin-top: 6px; }
-.quality-section-label {
-  font-size: 9px; font-weight: 700; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
-  font-family: 'JetBrains Mono', monospace;
-}
-.quality-chips { display: flex; gap: 4px; flex-wrap: wrap; }
-.quality-chip {
-  font-size: 10px; font-weight: 500; padding: 2px 9px; border-radius: 10px;
-}
-.quality-chip.detected { background: var(--success-subtle); color: var(--success); border: 1px solid var(--success-border); }
-.quality-chip.missing { background: var(--surface); color: var(--text-3); border: 1px solid var(--border); }
-.quality-hint {
-  font-size: 11px; color: var(--text-3); margin-top: 8px; line-height: 1.5; font-style: italic;
-}
+    .btn-generate {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 14px 20px;
+      transition: opacity 0.15s, transform 0.1s;
+      width: 100%;
+    }
 
-/* ── BOARD PACK OUTPUT BANNER ────────────────────────────────────────────── */
-.board-pack-banner {
-  background: linear-gradient(135deg, #EEF2FF 0%, #E8EDFF 100%);
-  border: 1px solid #C7D2FE; border-radius: 8px;
-  padding: 13px 16px; margin-bottom: 12px;
-  display: flex; align-items: center; gap: 12px;
-}
-.board-pack-banner-icon { font-size: 20px; flex-shrink: 0; }
-.board-pack-banner-title { font-size: 13px; font-weight: 700; color: #312E81; letter-spacing: -0.01em; }
-.board-pack-banner-sub { font-size: 11px; color: #4338CA; margin-top: 2px; }
+    .btn-generate:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-generate:active { transform: translateY(0); }
+    .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* ── EXPORT BUTTON ───────────────────────────────────────────────────────── */
-.output-actions { display: flex; gap: 8px; align-items: center; }
-.export-btn {
-  padding: 6px 14px; font-size: 12px; font-weight: 500;
-  color: var(--text-2); background: var(--surface-2);
-  border: 1.5px solid var(--border); border-radius: 6px;
-  cursor: pointer; font-family: 'Inter', sans-serif;
-  transition: all 0.15s; display: none; align-items: center; gap: 5px;
-}
-.export-btn.show { display: inline-flex; }
-.export-btn:hover { background: var(--border); color: var(--text); }
+    /* ── CONTENT AREA ── */
+    .content {
+      padding: 28px 32px;
+      overflow-y: auto;
+    }
 
-/* RESPONSIVE */
-@media (min-width: 768px) { .header-meta { display: block; } }
-@media (max-width: 960px) {
-  .workspace { grid-template-columns: 1fr; }
-  .use-cases-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 720px) {
-  .toggles { grid-template-columns: repeat(2, 1fr); }
-  .trust-points { grid-template-columns: 1fr; }
-}
-@media (max-width: 540px) {
-  .hero-headline { font-size: 24px; }
-  .hero { padding: 36px 0 28px; }
-  .stats { grid-template-columns: 1fr; }
-  .toggles { grid-template-columns: 1fr; }
-  .use-cases-grid { grid-template-columns: 1fr; }
-  .container { padding: 0 14px 56px; }
-  .artefact-actions { gap: 4px; }
-  .btn-sm { padding: 5px 10px; font-size: 10px; }
-  .modal { max-height: 90vh; }
-  .modal-overlay { padding: 16px; }
-  .modal-body { padding: 18px; }
-}
-</style>
+    /* ── CATEGORY SECTIONS ── */
+    .category-section {
+      margin-bottom: 40px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .cat-1 .category-number { background: var(--cat1); }
+    .cat-2 .category-number { background: var(--cat2); }
+    .cat-3 .category-number { background: var(--cat3); }
+    .cat-4 .category-number { background: var(--cat4); }
+
+    .category-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .category-subtitle {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    /* ── AGENT CARD ── */
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      user-select: none;
+      position: relative;
+    }
+
+    .agent-card:hover {
+      border-color: var(--accent);
+      background: var(--surface2);
+      transform: translateY(-1px);
+    }
+
+    .agent-card.selected {
+      border-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .cat-1 .agent-card.selected { border-color: var(--cat1); }
+    .cat-2 .agent-card.selected { border-color: var(--cat2); }
+    .cat-3 .agent-card.selected { border-color: var(--cat3); }
+    .cat-4 .agent-card.selected { border-color: var(--cat4); }
+
+    .agent-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid var(--border2);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      transition: all 0.15s;
+    }
+
+    .agent-card.selected .agent-check {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .cat-1 .agent-card.selected .agent-check { background: var(--cat1); border-color: var(--cat1); }
+    .cat-2 .agent-card.selected .agent-check { background: var(--cat2); border-color: var(--cat2); }
+    .cat-3 .agent-card.selected .agent-check { background: var(--cat3); border-color: var(--cat3); }
+    .cat-4 .agent-card.selected .agent-check { background: var(--cat4); border-color: var(--cat4); }
+
+    .agent-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .agent-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+      padding-right: 20px;
+    }
+
+    .agent-purpose {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .agent-output {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--subtle);
+      letter-spacing: 0.3px;
+    }
+
+    .agent-output span {
+      display: inline-block;
+      background: var(--border);
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-right: 3px;
+      margin-bottom: 3px;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-section {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .progress-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .progress-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .progress-bar-wrap {
+      background: var(--border);
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-agents {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .progress-agent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .progress-dot.running { background: var(--accent); animation: pulse 1s infinite; }
+    .progress-dot.done { background: var(--success); }
+    .progress-dot.error { background: var(--danger); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .progress-agent-name { color: var(--text); flex: 1; }
+    .progress-agent-status { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+    /* ── RESULTS ── */
+    .results-section { margin-top: 8px; }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .results-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .results-meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .artefact-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .artefact-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .artefact-header:hover { background: var(--surface2); }
+
+    .artefact-type-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .artefact-info { flex: 1; }
+
+    .artefact-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .artefact-stats {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .artefact-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-sm {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border2);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .btn-sm:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .artefact-body {
+      display: none;
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .artefact-body.open { display: block; }
+
+    .artefact-content {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    /* Markdown rendering */
+    .artefact-rendered { margin-top: 14px; }
+    .artefact-rendered h1 { font-size: 17px; font-weight: 800; color: var(--text); margin: 0 0 12px; letter-spacing: -0.3px; }
+    .artefact-rendered h2 { font-size: 14px; font-weight: 700; color: var(--text); margin: 16px 0 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    .artefact-rendered h3 { font-size: 13px; font-weight: 700; color: var(--accent); margin: 12px 0 6px; }
+    .artefact-rendered p { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.7; }
+    .artefact-rendered ul, .artefact-rendered ol { margin: 8px 0 10px 20px; }
+    .artefact-rendered li { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 3px; }
+    .artefact-rendered strong { color: var(--text); font-weight: 700; }
+    .artefact-rendered code { font-family: var(--mono); font-size: 11px; background: var(--border); padding: 1px 6px; border-radius: 3px; color: var(--accent); }
+    .artefact-rendered pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 10px 0; overflow-x: auto; }
+    .artefact-rendered pre code { background: none; padding: 0; }
+    .artefact-rendered table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+    .artefact-rendered th { background: var(--surface2); color: var(--text); font-weight: 700; padding: 8px 12px; text-align: left; border: 1px solid var(--border2); }
+    .artefact-rendered td { padding: 7px 12px; border: 1px solid var(--border); color: var(--muted); }
+    .artefact-rendered tr:nth-child(even) td { background: var(--surface); }
+    .artefact-rendered blockquote { border-left: 3px solid var(--accent); margin: 10px 0; padding: 8px 14px; background: var(--surface2); border-radius: 0 6px 6px 0; }
+    .artefact-rendered blockquote p { color: var(--text); margin: 0; }
+    .artefact-rendered hr { border: none; border-top: 1px solid var(--border2); margin: 16px 0; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 40px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.4; }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .empty-text { font-size: 13px; color: var(--muted); max-width: 360px; line-height: 1.7; }
+
+    /* ── ERROR ── */
+    .error-banner {
+      background: rgba(240,84,84,0.08);
+      border: 1px solid rgba(240,84,84,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--danger);
+      margin-bottom: 16px;
+    }
+
+    /* ── UTILITY ── */
+    .hidden { display: none; }
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="header">
+<!-- HEADER -->
+<header class="header">
   <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    </div>
+    <div class="logo-mark">VAF</div>
     <div>
-      <div class="logo-text">VAF Agentic Architect</div>
-      <div class="logo-sub">ZenCloud Global Consultants</div>
+      <div class="logo-text">Agentic Architect</div>
+      <div class="logo-sub">Velocity Architecture Framework™</div>
     </div>
   </div>
-  <div class="header-right">
-    <div class="header-meta">VAF v2 · ISO 42010 · claude-sonnet-4-6</div>
-    <div class="status">
-      <div class="status-dot"></div>
-      Agent live
-    </div>
+  <div class="header-meta">
+    <span class="chip">claude-sonnet-4-6</span>
+    <span class="chip">ISO/IEC/IEEE 42010:2022</span>
+    <span class="chip live" id="statusChip">● LIVE</span>
   </div>
-</div>
+</header>
 
-<div class="container">
+<div class="main">
 
-  <div class="hero">
-    <div class="hero-kicker">Velocity Architecture Framework v2</div>
-    <h1 class="hero-headline">Generate architecture decision artefacts from a single enterprise brief.</h1>
-    <p class="hero-sub">VAF structures business context, constraints, risks, and architecture drivers into decision-ready EA artefacts — aligned to VAF v2 and ISO/IEC/IEEE 42010:2022.</p>
-    <div class="value-badges">
-      <div class="value-badge"><span class="value-badge-dot"></span>Six architecture viewpoints</div>
-      <div class="value-badge"><span class="value-badge-dot"></span>Decision-ready artefacts</div>
-      <div class="value-badge"><span class="value-badge-dot"></span>Built for architecture governance</div>
+  <!-- SIDEBAR: Request Form -->
+  <aside class="sidebar">
+    <div class="form-group">
+      <label class="form-label">Topic *</label>
+      <input id="topicInput" class="form-input" type="text" placeholder="e.g. Cloud migration for financial services" />
     </div>
-  </div>
 
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-label">Framework</div>
-      <div class="stat-value">VAF v2</div>
-      <div class="stat-sub">ISO/IEC/IEEE 42010:2022</div>
+    <div class="form-group">
+      <label class="form-label">Context</label>
+      <textarea id="contextInput" class="form-textarea" rows="3" placeholder="Organisation, industry, scale, current state..."></textarea>
     </div>
-    <div class="stat">
-      <div class="stat-label">Viewpoints</div>
-      <div class="stat-value orange">6</div>
-      <div class="stat-sub">VP1 · VP2 · VP3 · VP4 · VP5 · VP6</div>
+
+    <div class="form-group">
+      <label class="form-label">Constraints</label>
+      <input id="constraintsInput" class="form-input" type="text" placeholder="Comma separated, e.g. APRA, ISO 27001" />
     </div>
-    <div class="stat">
-      <div class="stat-label">Generation</div>
-      <div class="stat-value" style="font-size:14px;font-family:'JetBrains Mono',monospace;letter-spacing:-0.01em">Parallel</div>
-      <div class="stat-sub">claude-sonnet-4-6 · v2.0.0</div>
-    </div>
-  </div>
 
-  <!-- WORKSPACE: two-column on desktop -->
-  <div class="workspace">
+    <hr class="section-divider" />
 
-    <!-- LEFT: Architecture Brief -->
-    <div class="workspace-main">
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-          Architecture brief
-        </div>
-
-        <div id="alert" class="alert"></div>
-
-        <div class="form-row">
-          <label for="topic">Architecture challenge or decision <span style="color:var(--orange)">*</span></label>
-          <input id="topic" type="text" placeholder="e.g. Modernise the customer identity platform across cloud and on-premise systems." />
-        </div>
-
-        <div class="form-row">
-          <label for="context">Business context, current state, target state, and risks</label>
-          <textarea id="context" placeholder="Include business drivers, current systems, stakeholders, deadlines, regulatory constraints, integrations, risks, and non-functional requirements." style="min-height:130px"></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="chips-label">
-            <label>Constraints and priorities</label>
-            <button class="chips-clear" onclick="clearChips()">Clear all</button>
-          </div>
-          <div class="chips-row">
-            <div class="chip" data-label="Security" onclick="toggleChip(this)">Security</div>
-            <div class="chip" data-label="Cost" onclick="toggleChip(this)">Cost</div>
-            <div class="chip" data-label="Time" onclick="toggleChip(this)">Time</div>
-            <div class="chip" data-label="Legacy systems" onclick="toggleChip(this)">Legacy systems</div>
-            <div class="chip" data-label="Regulatory" onclick="toggleChip(this)">Regulatory</div>
-            <div class="chip" data-label="Data sovereignty" onclick="toggleChip(this)">Data sovereignty</div>
-            <div class="chip" data-label="Integration complexity" onclick="toggleChip(this)">Integration complexity</div>
-            <div class="chip" data-label="Operational resilience" onclick="toggleChip(this)">Operational resilience</div>
-            <div class="chip" data-label="Vendor lock-in" onclick="toggleChip(this)">Vendor lock-in</div>
-            <div class="chip" data-label="Skills gap" onclick="toggleChip(this)">Skills gap</div>
-          </div>
-          <input id="constraints-custom" type="text" placeholder="Other constraints (comma separated)" />
-        </div>
-
-        <!-- Brief Quality Score -->
-        <div id="quality-panel" class="quality-panel" style="display:none">
-          <div class="quality-header">
-            <span class="quality-label">Brief Quality</span>
-            <span class="quality-badge needs-detail" id="quality-badge">Needs detail</span>
-          </div>
-          <div class="quality-section">
-            <div class="quality-section-label">Detected</div>
-            <div class="quality-chips" id="quality-detected"></div>
-          </div>
-          <div class="quality-section" id="quality-missing-section">
-            <div class="quality-section-label">Missing</div>
-            <div class="quality-chips" id="quality-missing"></div>
-          </div>
-          <div class="quality-hint" id="quality-hint"></div>
-        </div>
-
-        <button class="generate-btn" id="generate-btn" onclick="generate()">
-          ⚡ Generate artefacts
-        </button>
-
-        <div class="progress" id="progress">
-          <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
-          <div class="progress-text" id="progress-text">Initialising agent...</div>
+    <div class="form-group">
+      <div class="selected-summary-label form-label">Selected Agents</div>
+      <div class="selected-summary">
+        <div class="selected-tags" id="selectedTags">
+          <span class="selected-empty">Select agents from the panel →</span>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Sidebar -->
-    <div class="workspace-side">
+    <button id="generateBtn" class="btn-generate" disabled>
+      ⚡ Generate Artefacts
+    </button>
+  </aside>
 
-      <!-- Architecture Board Pack -->
-      <div class="board-pack-feature">
-        <div class="board-pack-eyebrow">Featured</div>
-        <div class="board-pack-title">Architecture Board Pack</div>
-        <div class="board-pack-desc">Governance-ready pack for steering committees and architecture review boards. Includes all six viewpoints — guardrails, trade-offs, ADR, velocity, confidence, and integrity.</div>
-        <div class="board-pack-tags">
-          <span class="board-pack-tag">VP1 Guardrail</span>
-          <span class="board-pack-tag">VP2 Trade-off</span>
-          <span class="board-pack-tag">VP3 ADR</span>
-          <span class="board-pack-tag">VP4 Velocity</span>
-          <span class="board-pack-tag">VP5 Pulse</span>
-          <span class="board-pack-tag">VP6 Integrity</span>
-        </div>
-        <button class="board-pack-btn" id="board-pack-btn" onclick="selectBoardPack()">
-          🎯 Select board pack
-        </button>
-      </div>
+  <!-- CONTENT: Agents + Results -->
+  <div class="content" id="mainContent">
 
-      <!-- Example briefs -->
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Try an example brief
-        </div>
-        <div class="examples-grid">
-          <button class="example-btn" onclick="useExample(0)">☁ Cloud migration</button>
-          <button class="example-btn" onclick="useExample(1)">🏦 Core banking modernisation</button>
-          <button class="example-btn" onclick="useExample(2)">🤖 AI governance platform</button>
-          <button class="example-btn" onclick="useExample(3)">⚙ SAP integration strategy</button>
-          <button class="example-btn" onclick="useExample(4)">🔒 Cyber resilience uplift</button>
-          <button class="example-btn" onclick="useExample(5)">👤 Customer identity modernisation</button>
-        </div>
-      </div>
+    <!-- AGENT SELECTION -->
+    <div id="agentPanel">
 
-      <!-- Artefacts to generate -->
-      <div class="card">
-        <div class="card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Artefacts to generate
+      <!-- Category 1: Strategic EA -->
+      <div class="category-section cat-1">
+        <div class="category-header">
+          <div class="category-number">1</div>
+          <div>
+            <div class="category-title">Strategic EA Agents</div>
+          </div>
+          <span class="category-subtitle">Drive direction, alignment, and enterprise intent</span>
         </div>
-        <div class="toggles">
-          <div class="toggle on" data-type="governance" onclick="toggleArtefact(this)">
-            <span class="toggle-label">📋 VP1 Guardrail Canvas</span>
-            <span class="toggle-desc">Principles, rules, constraints, and non-negotiables</span>
+        <div class="agent-grid">
+          <div class="agent-card" data-type="guardrail-canvas" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🧭</span>
+            <div class="agent-name">Strategy Agent</div>
+            <div class="agent-purpose">Translates strategy into architecture direction and guardrails</div>
+            <div class="agent-output"><span>Guardrail Canvas</span><span>Strategic Roadmap</span></div>
           </div>
-          <div class="toggle on" data-type="strategy" onclick="toggleArtefact(this)">
-            <span class="toggle-label">⚖️ VP2 Trade-off Matrix</span>
-            <span class="toggle-desc">Options across cost, risk, speed, quality, and strategic fit</span>
+          <div class="agent-card" data-type="trade-off-matrix" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">💰</span>
+            <div class="agent-name">Investment Agent</div>
+            <div class="agent-purpose">Prioritises and optimises EA investments with ROI analysis</div>
+            <div class="agent-output"><span>Trade-off Matrix</span><span>Business Case</span></div>
           </div>
-          <div class="toggle on" data-type="design" onclick="toggleArtefact(this)">
-            <span class="toggle-label">🏗️ VP3 ADR</span>
-            <span class="toggle-desc">Context, decision, options, consequences, and rationale</span>
+          <div class="agent-card" data-type="capability-map" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">⬡</span>
+            <div class="agent-name">Capability Agent</div>
+            <div class="agent-purpose">Identifies capability gaps and maturity across the organisation</div>
+            <div class="agent-output"><span>Capability Map</span><span>Gap Analysis</span></div>
           </div>
-          <div class="toggle on" data-type="velocity" onclick="toggleArtefact(this)">
-            <span class="toggle-label">⚡ VP4 Velocity Dashboard</span>
-            <span class="toggle-desc">Execution signals, risks, blockers, and delivery indicators</span>
-          </div>
-          <div class="toggle on" data-type="rhythm" onclick="toggleArtefact(this)">
-            <span class="toggle-label">🔄 VP5 Pulse System</span>
-            <span class="toggle-desc">Decision health, governance signals, architecture confidence</span>
-          </div>
-          <div class="toggle on" data-type="practitioner" onclick="toggleArtefact(this)">
-            <span class="toggle-label">🧭 VP6 Integrity Arc</span>
-            <span class="toggle-desc">Coherence across strategy, delivery, risk, and operations</span>
-          </div>
-        </div>
-
-        <div class="packs-section">
-          <div class="packs-label">Recommended packs</div>
-          <div class="packs-grid">
-            <button class="pack-btn" data-pack="executive" onclick="selectPack('executive')">Executive decision — VP2+VP3+VP6</button>
-            <button class="pack-btn" data-pack="governance" onclick="selectPack('governance')">Governance guardrails — VP1+VP5</button>
-            <button class="pack-btn" data-pack="delivery" onclick="selectPack('delivery')">Delivery execution — VP4+VP5</button>
-            <button class="pack-btn" data-pack="highrisk" onclick="selectPack('highrisk')">High-risk decision — VP2+VP3+VP6</button>
-            <button class="pack-btn" data-pack="full" onclick="selectPack('full')">Full architecture pack — VP1–VP6</button>
+          <div class="agent-card" data-type="portfolio-roadmap" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">📊</span>
+            <div class="agent-name">Portfolio Agent</div>
+            <div class="agent-purpose">Rationalises and optimises the application portfolio</div>
+            <div class="agent-output"><span>Portfolio Roadmap</span><span>TCO Analysis</span></div>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- ARTEFACTS OUTPUT -->
-  <div class="card" style="margin-bottom:16px">
-    <div class="artefacts-header">
-      <div class="card-title" style="margin-bottom:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Generated artefacts
-      </div>
-      <div class="output-actions">
-        <button class="export-btn" id="export-btn" onclick="exportReport()">↓ Export report</button>
-        <button class="copy-all-btn" id="copy-all-btn" onclick="copyAllArtefacts()">⎘ Copy all</button>
-      </div>
-    </div>
-    <div id="artefact-list">
-      <div class="empty">
-        <div class="empty-icon">📂</div>
-        <div class="empty-title">No artefacts generated yet.</div>
-        <div class="empty-desc">Start with a short architecture challenge. Describe a system, transformation, risk, decision, or delivery problem. VAF will generate your selected artefacts from the brief.</div>
-        <div class="empty-actions">
-          <button class="empty-action primary" onclick="useSampleBrief()">Use sample brief</button>
-          <button class="empty-action" onclick="selectAndGenerateAll()">Generate all viewpoints</button>
-          <button class="empty-action" onclick="generateADROnly()">Start with ADR only</button>
+      <!-- Category 2: Architecture Design -->
+      <div class="category-section cat-2">
+        <div class="category-header">
+          <div class="category-number">2</div>
+          <div>
+            <div class="category-title">Architecture Design Agents</div>
+          </div>
+          <span class="category-subtitle">Design solutions that are robust, reusable, and future-ready</span>
+        </div>
+        <div class="agent-grid">
+          <div class="agent-card" data-type="domain-model" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🏢</span>
+            <div class="agent-name">Business Architecture Agent</div>
+            <div class="agent-purpose">Models business capabilities, processes, and value streams</div>
+            <div class="agent-output"><span>Domain Model</span><span>Capability Map</span></div>
+          </div>
+          <div class="agent-card" data-type="data-architecture" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🗄️</span>
+            <div class="agent-name">Data Architecture Agent</div>
+            <div class="agent-purpose">Designs enterprise data architecture and governance</div>
+            <div class="agent-output"><span>Data Domain Map</span><span>Data Blueprint</span></div>
+          </div>
+          <div class="agent-card" data-type="application-blueprint" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">📱</span>
+            <div class="agent-name">Application Architecture Agent</div>
+            <div class="agent-purpose">Designs application landscape and target state</div>
+            <div class="agent-output"><span>App Blueprint</span><span>Fit/Gap Report</span></div>
+          </div>
+          <div class="agent-card" data-type="integration-map" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🔗</span>
+            <div class="agent-name">Integration Architecture Agent</div>
+            <div class="agent-purpose">Designs integration patterns and API ecosystems</div>
+            <div class="agent-output"><span>Integration Blueprint</span><span>Dependency Map</span></div>
+          </div>
+          <div class="agent-card" data-type="technology-radar" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">☁️</span>
+            <div class="agent-name">Technology Architecture Agent</div>
+            <div class="agent-purpose">Defines technology standards, platforms, and roadmap</div>
+            <div class="agent-output"><span>Technology Radar</span><span>Standards Roadmap</span></div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="trust-section">
-    <div class="trust-title">Architecture-aligned, not just AI-generated.</div>
-    <div class="trust-sub">VAF structures outputs around architecture viewpoints, decisions, trade-offs, governance controls, and execution signals. Designed to support architecture thinking, not produce generic AI text.</div>
-    <div class="trust-points">
-      <div class="trust-point">
-        <div class="trust-point-icon">◈</div>
-        <div class="trust-point-text"><strong>Based on VAF v2</strong> — framework designed for enterprise decision governance, not general-purpose AI output</div>
+      <!-- Category 3: Governance & Assurance -->
+      <div class="category-section cat-3">
+        <div class="category-header">
+          <div class="category-number">3</div>
+          <div>
+            <div class="category-title">Governance &amp; Assurance Agents</div>
+          </div>
+          <span class="category-subtitle">Ensure compliance, quality, and architectural integrity</span>
+        </div>
+        <div class="agent-grid">
+          <div class="agent-card" data-type="compliance-report" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">✅</span>
+            <div class="agent-name">Compliance Agent</div>
+            <div class="agent-purpose">Ensures policy, standard, and regulatory compliance</div>
+            <div class="agent-output"><span>Compliance Report</span><span>Exception Register</span></div>
+          </div>
+          <div class="agent-card" data-type="risk-register" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">⚠️</span>
+            <div class="agent-name">Risk Agent</div>
+            <div class="agent-purpose">Identifies and assesses architectural risks with mitigations</div>
+            <div class="agent-output"><span>Risk Register</span><span>Risk Heatmap</span></div>
+          </div>
+          <div class="agent-card" data-type="tech-debt-dashboard" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🔧</span>
+            <div class="agent-name">Technical Debt Agent</div>
+            <div class="agent-purpose">Detects and prioritises code and architecture technical debt</div>
+            <div class="agent-output"><span>Debt Dashboard</span><span>Remediation Plan</span></div>
+          </div>
+          <div class="agent-card" data-type="adr" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">📋</span>
+            <div class="agent-name">Decision Agent</div>
+            <div class="agent-purpose">Supports architectural decisions with structured rationale</div>
+            <div class="agent-output"><span>ADR</span><span>Trade-off Summary</span></div>
+          </div>
+        </div>
       </div>
-      <div class="trust-point">
-        <div class="trust-point-icon">⊞</div>
-        <div class="trust-point-text"><strong>ISO/IEC/IEEE 42010:2022</strong> — viewpoint structure aligned to the international standard for architecture description</div>
-      </div>
-      <div class="trust-point">
-        <div class="trust-point-icon">△</div>
-        <div class="trust-point-text"><strong>Decision traceability</strong> — artefacts are linked, not isolated; each viewpoint reinforces the others</div>
-      </div>
-      <div class="trust-point">
-        <div class="trust-point-icon">◇</div>
-        <div class="trust-point-text"><strong>Governance-ready</strong> — outputs structured for Architecture Review Boards, CTO/CISO stakeholders, and governance bodies</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="use-cases-section">
-    <div class="use-cases-title">Use VAF for</div>
-    <div class="use-cases-grid">
-      <div class="use-case"><span class="use-case-arrow">→</span>Cloud migration decisions</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Platform modernisation</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Vendor / product selection</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>AI governance</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Cyber resilience uplift</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Integration strategy</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Operating model change</div>
-      <div class="use-case"><span class="use-case-arrow">→</span>Architecture review preparation</div>
-    </div>
-  </div>
-
-</div>
-
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title">Artefact</div>
-      <div class="modal-actions">
-        <button class="modal-copy-btn" id="modal-copy-btn" onclick="copyModalContent()">⎘ Copy</button>
-        <button class="modal-close" onclick="document.getElementById('modal').classList.remove('show')">✕</button>
+      <!-- Category 4: Delivery & Value -->
+      <div class="category-section cat-4">
+        <div class="category-header">
+          <div class="category-number">4</div>
+          <div>
+            <div class="category-title">Delivery &amp; Value Agents</div>
+          </div>
+          <span class="category-subtitle">Accelerate delivery and ensure value realisation</span>
+        </div>
+        <div class="agent-grid">
+          <div class="agent-card" data-type="solution-review" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🔍</span>
+            <div class="agent-name">Solution Review Agent</div>
+            <div class="agent-purpose">Automates architecture reviews and quality checks</div>
+            <div class="agent-output"><span>Review Report</span><span>Issues Log</span></div>
+          </div>
+          <div class="agent-card" data-type="spec-validation" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">📐</span>
+            <div class="agent-name">Spec Validation Agent</div>
+            <div class="agent-purpose">Validates requirements against architecture specifications</div>
+            <div class="agent-output"><span>Spec Validation</span><span>Traceability Matrix</span></div>
+          </div>
+          <div class="agent-card" data-type="integrity-arc" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">🎓</span>
+            <div class="agent-name">Architecture Coach Agent</div>
+            <div class="agent-purpose">Guides teams and upskills architects with best practices</div>
+            <div class="agent-output"><span>Playbook</span><span>Coaching Notes</span></div>
+          </div>
+          <div class="agent-card" data-type="value-dashboard" onclick="toggleAgent(this)">
+            <div class="agent-check">✓</div>
+            <span class="agent-icon">📈</span>
+            <div class="agent-name">Value Tracking Agent</div>
+            <div class="agent-purpose">Tracks KPIs, benefits, and value realisation against plan</div>
+            <div class="agent-output"><span>KPI Dashboard</span><span>Benefit Realisation</span></div>
+          </div>
+        </div>
       </div>
+
+    </div><!-- /agentPanel -->
+
+    <!-- PROGRESS (hidden until generate) -->
+    <div id="progressSection" class="progress-section hidden">
+      <div class="progress-header">
+        <span class="progress-title">Generating Artefacts</span>
+        <span class="progress-count" id="progressCount">0 / 0</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div class="progress-agents" id="progressAgents"></div>
     </div>
-    <div class="modal-body">
-      <div id="modal-content" class="md"></div>
+
+    <!-- ERROR -->
+    <div id="errorBanner" class="error-banner hidden"></div>
+
+    <!-- RESULTS -->
+    <div id="resultsSection" class="results-section hidden">
+      <div class="results-header">
+        <div class="results-title">Generated Artefacts</div>
+        <div class="results-meta" id="resultsMeta"></div>
+      </div>
+      <div id="artefactsList"></div>
     </div>
-  </div>
-</div>
+
+    <!-- EMPTY STATE (default) -->
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">⚡</div>
+      <div class="empty-title">Ready to generate</div>
+      <div class="empty-text">Select agents above, enter a topic, and click Generate Artefacts to produce your EA deliverables.</div>
+    </div>
+
+  </div><!-- /content -->
+
+</div><!-- /main -->
 
 <script>
-const API = window.location.origin;
-let artefacts = [];
-let progressInterval;
-let boardPackMode = false;
+  // ── STATE ──
+  const selected = new Set();
+  let artefacts = [];
 
-// ── EXAMPLE BRIEFS ────────────────────────────────────────────────────────────
-const EXAMPLES = [
-  {
-    topic: 'Cloud migration strategy for enterprise workloads',
-    context: 'Mid-size financial services firm. 200+ applications across on-premises data centres. Moving to Azure. Legacy core systems must remain on-prem. Regulatory constraints under APRA CPS 231 and CPS 234. Key stakeholders: CTO, CISO, Head of Infrastructure. Target state: hybrid cloud with cloud-native applications by 2027.',
-    constraints: ['Security', 'Regulatory', 'Cost', 'Data sovereignty'],
-    artefacts: ['governance', 'strategy', 'design', 'velocity']
-  },
-  {
-    topic: 'Core banking platform modernisation and API strategy',
-    context: 'Regional bank. Aging Temenos T24 core banking system. Customer-facing digital channels growing 40% YoY. Need to expose core banking capabilities via modern API layer. Integration with 12 downstream systems. Regulatory compliance with APRA. Zero downtime requirement.',
-    constraints: ['Legacy systems', 'Integration complexity', 'Operational resilience', 'Regulatory'],
-    artefacts: ['governance', 'strategy', 'design', 'practitioner']
-  },
-  {
-    topic: 'AI governance and risk management framework',
-    context: 'Large professional services firm deploying AI models across audit, advisory, and legal services. Regulatory and ethical obligations. Need governance controls for model selection, data quality, explainability, and bias detection. Audience: Risk Committee, Board.',
-    constraints: ['Regulatory', 'Data sovereignty', 'Security', 'Vendor lock-in'],
-    artefacts: ['governance', 'strategy', 'practitioner', 'rhythm']
-  },
-  {
-    topic: 'SAP S/4HANA integration strategy and enterprise data architecture',
-    context: 'Manufacturing conglomerate. SAP S/4HANA as system of record. 30+ integration touchpoints including MES, WMS, CRM, and e-commerce. Moving from point-to-point to an integration platform. Key risks: data consistency, operational continuity, skills gap.',
-    constraints: ['Integration complexity', 'Legacy systems', 'Skills gap', 'Cost'],
-    artefacts: ['strategy', 'design', 'velocity', 'practitioner']
-  },
-  {
-    topic: 'Cyber resilience and zero trust architecture uplift',
-    context: 'Government agency. IRAP assessment identified material gaps. Uplift required for zero trust network access, identity and access management, privileged access management, and security operations centre capability. Budget constrained. 18-month program.',
-    constraints: ['Security', 'Regulatory', 'Time', 'Cost'],
-    artefacts: ['governance', 'strategy', 'design', 'rhythm']
-  },
-  {
-    topic: 'Customer identity and access management platform modernisation',
-    context: 'Retail bank. Fragmented identity estate: 3 legacy IAM systems, 4 million customer identities. Move to unified CIAM platform. Requirements: omnichannel SSO, MFA, fraud detection, consent management under CDR and Privacy Act. Integration with digital banking platform.',
-    constraints: ['Security', 'Regulatory', 'Data sovereignty', 'Integration complexity'],
-    artefacts: ['governance', 'strategy', 'design', 'velocity']
-  }
-];
+  // ── AGENT DEFINITIONS ──
+  const AGENT_DEFS = {
+    'guardrail-canvas':      { label: 'Guardrail Canvas',          icon: '🧭', cat: 1 },
+    'trade-off-matrix':      { label: 'Trade-off Matrix',          icon: '💰', cat: 1 },
+    'capability-map':        { label: 'Capability Map',            icon: '⬡',  cat: 1 },
+    'portfolio-roadmap':     { label: 'Portfolio Roadmap',         icon: '📊', cat: 1 },
+    'domain-model':          { label: 'Domain Model',              icon: '🏢', cat: 2 },
+    'data-architecture':     { label: 'Data Architecture',         icon: '🗄️', cat: 2 },
+    'application-blueprint': { label: 'Application Blueprint',     icon: '📱', cat: 2 },
+    'integration-map':       { label: 'Integration Map',           icon: '🔗', cat: 2 },
+    'technology-radar':      { label: 'Technology Radar',          icon: '☁️', cat: 2 },
+    'compliance-report':     { label: 'Compliance Report',         icon: '✅', cat: 3 },
+    'risk-register':         { label: 'Risk Register',             icon: '⚠️', cat: 3 },
+    'tech-debt-dashboard':   { label: 'Tech Debt Dashboard',       icon: '🔧', cat: 3 },
+    'adr':                   { label: 'ADR',                       icon: '📋', cat: 3 },
+    'solution-review':       { label: 'Solution Review',           icon: '🔍', cat: 4 },
+    'spec-validation':       { label: 'Spec Validation',           icon: '📐', cat: 4 },
+    'integrity-arc':         { label: 'Integrity Arc',             icon: '🎓', cat: 4 },
+    'value-dashboard':       { label: 'Value Dashboard',           icon: '📈', cat: 4 },
+  };
 
-// ── PACK DEFINITIONS ──────────────────────────────────────────────────────────
-const PACKS = {
-  executive:  { artefacts: ['strategy', 'design', 'practitioner'] },
-  governance: { artefacts: ['governance', 'rhythm'] },
-  delivery:   { artefacts: ['velocity', 'rhythm'] },
-  highrisk:   { artefacts: ['strategy', 'design', 'practitioner'] },
-  full:       { artefacts: ['governance', 'strategy', 'design', 'velocity', 'rhythm', 'practitioner'] }
-};
-
-// ── FORM HELPERS ──────────────────────────────────────────────────────────────
-function toggleArtefact(el) { el.classList.toggle('on'); clearPackHighlight(); clearBoardPackState(); }
-function toggleChip(el) { el.classList.toggle('on'); scoreBrief(); }
-function clearChips() {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-  document.getElementById('constraints-custom').value = '';
-  scoreBrief();
-}
-function clearPackHighlight() { document.querySelectorAll('.pack-btn').forEach(b => b.classList.remove('active')); }
-
-function getConstraints() {
-  const chips = [...document.querySelectorAll('.chip.on')].map(c => c.dataset.label);
-  const custom = document.getElementById('constraints-custom').value
-    .split(',').map(s => s.trim()).filter(Boolean);
-  return [...chips, ...custom];
-}
-
-function selectPack(packKey) {
-  clearBoardPackState();
-  const pack = PACKS[packKey];
-  document.querySelectorAll('.toggle').forEach(t => t.classList.remove('on'));
-  pack.artefacts.forEach(type => {
-    const el = document.querySelector(`.toggle[data-type="${type}"]`);
-    if (el) el.classList.add('on');
-  });
-  document.querySelectorAll('.pack-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.pack === packKey)
-  );
-}
-
-function useExample(idx) {
-  const ex = EXAMPLES[idx];
-  document.getElementById('topic').value = ex.topic;
-  document.getElementById('context').value = ex.context;
-  document.querySelectorAll('.chip').forEach(chip =>
-    chip.classList.toggle('on', ex.constraints.includes(chip.dataset.label))
-  );
-  document.getElementById('constraints-custom').value = '';
-  document.querySelectorAll('.toggle').forEach(t =>
-    t.classList.toggle('on', ex.artefacts.includes(t.dataset.type))
-  );
-  clearPackHighlight();
-  clearBoardPackState();
-  scoreBrief();
-  document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ── BOARD PACK ────────────────────────────────────────────────────────────────
-function selectBoardPack() {
-  boardPackMode = true;
-  document.querySelectorAll('.toggle').forEach(t => t.classList.add('on'));
-  clearPackHighlight();
-  const btn = document.getElementById('board-pack-btn');
-  if (btn) { btn.classList.add('selected'); btn.innerHTML = '✓ Board pack selected'; }
-  document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function clearBoardPackState() {
-  if (!boardPackMode) return;
-  boardPackMode = false;
-  const btn = document.getElementById('board-pack-btn');
-  if (btn) { btn.classList.remove('selected'); btn.innerHTML = '🎯 Select board pack'; }
-}
-
-function useSampleBrief() { useExample(0); }
-
-function selectAndGenerateAll() {
-  document.querySelectorAll('.toggle').forEach(t => t.classList.add('on'));
-  clearPackHighlight();
-  generate();
-}
-
-function generateADROnly() {
-  document.querySelectorAll('.toggle').forEach(t => t.classList.remove('on'));
-  const adr = document.querySelector('.toggle[data-type="design"]');
-  if (adr) adr.classList.add('on');
-  clearPackHighlight();
-  generate();
-}
-
-// ── BRIEF QUALITY SCORE ───────────────────────────────────────────────────────
-const QUALITY_SIGNALS = [
-  { key: 'driver',       label: 'Business driver',       patterns: [/business/i, /strategic/i, /\bdriver\b/i, /require/i, /objective/i, /mandate/i, /\bgoal\b/i] },
-  { key: 'current',      label: 'Current state',         patterns: [/current/i, /existing/i, /legacy/i, /as.is/i, /\btoday\b/i, /aging/i, /fragmented/i, /incumbent/i] },
-  { key: 'target',       label: 'Target state',          patterns: [/target/i, /future/i, /to.be/i, /modernise/i, /modernize/i, /migrate to/i, /move to/i, /transform/i, /by 20\d\d/, /cloud.native/i] },
-  { key: 'stakeholders', label: 'Stakeholders',          patterns: [/\bcto\b/i, /\bciso\b/i, /\bceo\b/i, /stakeholder/i, /committee/i, /head of/i, /audience/i, /executive/i, /\bboard\b/i] },
-  { key: 'risks',        label: 'Risks',                 patterns: [/\brisk/i, /threat/i, /exposure/i, /vulnerability/i, /\bgap\b/i, /failure/i, /breach/i, /concern/i] },
-  { key: 'timeline',     label: 'Timeline',              patterns: [/20\d\d/, /month/i, /quarter/i, /deadline/i, /program/i, /\bphase\b/i, /\bweek\b/i, /sprint/i] },
-  { key: 'security',     label: 'Security / compliance', patterns: [/security/i, /regulatory/i, /\bapra\b/i, /\birap\b/i, /\bgdpr\b/i, /privacy/i, /compliance/i, /\bzero trust/i, /\bsoc\b/i] },
-  { key: 'integration',  label: 'Integration',           patterns: [/integrat/i, /\bapi\b/i, /downstream/i, /upstream/i, /interface/i, /touchpoint/i] },
-  { key: 'nfr',          label: 'Non-functional req.',   patterns: [/performance/i, /availability/i, /scalab/i, /uptime/i, /\bsla\b/i, /resilience/i, /non.functional/i, /zero downtime/i, /latency/i] },
-  { key: 'constraints',  label: 'Constraints',           patterns: [] }
-];
-
-function scoreBrief() {
-  const topic = document.getElementById('topic').value;
-  const context = document.getElementById('context').value;
-  const combined = topic + ' ' + context;
-  const hasChips = document.querySelectorAll('.chip.on').length > 0;
-  const hasCustom = document.getElementById('constraints-custom').value.trim().length > 0;
-  const panel = document.getElementById('quality-panel');
-  if (!panel) return;
-
-  if (!topic.trim() && !context.trim()) { panel.style.display = 'none'; return; }
-  panel.style.display = 'block';
-
-  const detected = [], missing = [];
-  for (const sig of QUALITY_SIGNALS) {
-    const found = sig.key === 'constraints'
-      ? (hasChips || hasCustom)
-      : sig.patterns.some(p => p.test(combined));
-    (found ? detected : missing).push(sig.label);
-  }
-
-  const n = detected.length;
-  let level, cls;
-  if (n < 3)      { level = 'Needs detail'; cls = 'needs-detail'; }
-  else if (n < 7) { level = 'Good';         cls = 'good'; }
-  else            { level = 'Strong';       cls = 'strong'; }
-
-  const badge = document.getElementById('quality-badge');
-  badge.textContent = level;
-  badge.className = 'quality-badge ' + cls;
-
-  document.getElementById('quality-detected').innerHTML = detected.length
-    ? detected.map(d => `<span class="quality-chip detected">${d}</span>`).join('')
-    : '<span class="quality-chip missing">None yet</span>';
-
-  const missingSec = document.getElementById('quality-missing-section');
-  const topMissing = missing.slice(0, 4);
-  if (topMissing.length) {
-    document.getElementById('quality-missing').innerHTML = topMissing.map(m => `<span class="quality-chip missing">${m}</span>`).join('');
-    missingSec.style.display = 'block';
-  } else {
-    missingSec.style.display = 'none';
-  }
-
-  const hint = document.getElementById('quality-hint');
-  if (cls === 'needs-detail') {
-    hint.textContent = 'Add current state, target state, risks, and stakeholders for better results.';
-  } else if (cls === 'good') {
-    hint.textContent = 'Add non-functional requirements, integration details, or a timeline to strengthen output quality.';
-  } else {
-    hint.textContent = '';
-  }
-}
-
-// ── ALERTS ────────────────────────────────────────────────────────────────────
-function showAlert(msg, type) {
-  const el = document.getElementById('alert');
-  el.textContent = msg;
-  el.className = 'alert show ' + type;
-  setTimeout(() => el.classList.remove('show'), 5000);
-}
-
-// ── PROGRESS ──────────────────────────────────────────────────────────────────
-function startProgress() {
-  let pct = 0;
-  const messages = [
-    'Loading VAF framework from GitHub...',
-    'Planning artefact generation...',
-    'Generating artefacts in parallel...',
-    'Running VP1 Guardrail Canvas...',
-    'Running VP2 Trade-off Matrix...',
-    'Running VP3 ADR...',
-    'Running VP4 Velocity Dashboard...',
-    'Running VP5 Pulse System...',
-    'Running VP6 Integrity Arc...',
-    'Validating against correspondence rules...',
-    'Committing artefacts to GitHub...'
-  ];
-  let msgIdx = 0;
-  document.getElementById('progress').classList.add('show');
-  document.getElementById('progress-text').textContent = messages[0];
-  progressInterval = setInterval(() => {
-    pct = Math.min(pct + 1.2, 90);
-    document.getElementById('progress-bar').style.width = pct + '%';
-    if (pct > (msgIdx + 1) * 11 && msgIdx < messages.length - 1) {
-      msgIdx++;
-      document.getElementById('progress-text').textContent = messages[msgIdx];
-    }
-  }, 1000);
-}
-
-function stopProgress() {
-  clearInterval(progressInterval);
-  document.getElementById('progress-bar').style.width = '100%';
-  document.getElementById('progress-text').textContent = 'Complete.';
-  setTimeout(() => {
-    document.getElementById('progress').classList.remove('show');
-    document.getElementById('progress-bar').style.width = '0%';
-  }, 1500);
-}
-
-// ── GENERATE ──────────────────────────────────────────────────────────────────
-async function generate() {
-  const topic = document.getElementById('topic').value.trim();
-  if (!topic) { showAlert('Architecture challenge is required.', 'error'); return; }
-
-  const selected = [...document.querySelectorAll('.toggle.on')].map(t => t.dataset.type);
-  if (selected.length === 0) { showAlert('Select at least one artefact type.', 'error'); return; }
-
-  const constraints = getConstraints();
-  const btn = document.getElementById('generate-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-  startProgress();
-
-  try {
-    const res = await fetch(`${API}/artefacts/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        topic,
-        context: document.getElementById('context').value.trim(),
-        constraints,
-        requestedArtefacts: selected
-      })
-    });
-
-    const data = await res.json();
-    stopProgress();
-
-    if (data.artefacts && data.artefacts.length > 0) {
-      artefacts = [...data.artefacts, ...artefacts];
-      renderArtefacts(data.requestId);
-      showAlert(`Generated ${data.artefacts.length} artefact${data.artefacts.length !== 1 ? 's' : ''} and committed to GitHub.`, 'success');
+  // ── TOGGLE AGENT SELECTION ──
+  function toggleAgent(card) {
+    const type = card.dataset.type;
+    if (selected.has(type)) {
+      selected.delete(type);
+      card.classList.remove('selected');
     } else {
-      showAlert('Generation failed: ' + (data.errors || []).join(', '), 'error');
+      selected.add(type);
+      card.classList.add('selected');
     }
-  } catch (err) {
-    stopProgress();
-    showAlert('Request failed: ' + err.message, 'error');
+    updateSidebar();
   }
 
-  btn.disabled = false;
-  btn.textContent = '⚡ Generate artefacts';
-}
+  function updateSidebar() {
+    const tagsEl = document.getElementById('selectedTags');
+    const btn = document.getElementById('generateBtn');
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-const ARTEFACT_ICONS  = { governance: ['icon-gov','📋'], strategy: ['icon-str','⚖️'], design: ['icon-des','🏗️'], velocity: ['icon-vel','⚡'], rhythm: ['icon-rhy','🔄'], practitioner: ['icon-pra','🧭'] };
-const ARTEFACT_LABELS = { governance: 'VP1 Guardrail Canvas', strategy: 'VP2 Trade-off Matrix', design: 'VP3 ADR', velocity: 'VP4 Velocity Dashboard', rhythm: 'VP5 Pulse System', practitioner: 'VP6 Integrity Arc' };
-
-function renderArtefacts(latestRequestId) {
-  const list = document.getElementById('artefact-list');
-  const copyAllBtn = document.getElementById('copy-all-btn');
-  const exportBtn = document.getElementById('export-btn');
-
-  if (artefacts.length === 0) {
-    copyAllBtn.classList.remove('show');
-    if (exportBtn) exportBtn.classList.remove('show');
-    list.innerHTML = `<div class="empty">
-      <div class="empty-icon">📂</div>
-      <div class="empty-title">No artefacts generated yet.</div>
-      <div class="empty-desc">Start with a short architecture challenge. Describe a system, transformation, risk, decision, or delivery problem. VAF will generate selected architecture artefacts from your brief.</div>
-      <div class="empty-actions">
-        <button class="empty-action primary" onclick="useSampleBrief()">Use sample brief</button>
-        <button class="empty-action" onclick="selectAndGenerateAll()">Generate all viewpoints</button>
-        <button class="empty-action" onclick="generateADROnly()">Start with ADR only</button>
-      </div>
-    </div>`;
-    return;
+    if (selected.size === 0) {
+      tagsEl.innerHTML = '<span class="selected-empty">Select agents from the panel →</span>';
+      btn.disabled = true;
+    } else {
+      tagsEl.innerHTML = [...selected].map(t => {
+        const def = AGENT_DEFS[t];
+        return `<span class="selected-tag">${def.icon} ${def.label}</span>`;
+      }).join('');
+      btn.disabled = false;
+    }
   }
 
-  copyAllBtn.classList.add('show');
-  if (exportBtn) exportBtn.classList.add('show');
+  // ── MARKDOWN RENDERER ──
+  function renderMarkdown(md) {
+    if (!md) return '';
+    let html = md
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^---+$/gm, '<hr/>')
+      .replace(/^\| (.+) \|$/gm, row => {
+        const cells = row.slice(2,-2).split(' | ');
+        return '<tr>' + cells.map(c => c.match(/^[-:]+$/) ? '' : `<td>${c}</td>`).join('') + '</tr>';
+      })
+      .replace(/(<tr>.*<\/tr>\n)+/g, m => `<table>${m}</table>`)
+      .replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>')
+      .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n)+/g, m => `<ul>${m}</ul>`)
+      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^(?!<[a-z])(.+)$/gm, m => m.trim() ? m : '');
+    return `<div class="artefact-rendered">${html}</div>`;
+  }
 
-  const banner = boardPackMode
-    ? `<div class="board-pack-banner">
-        <div class="board-pack-banner-icon">🎯</div>
-        <div>
-          <div class="board-pack-banner-title">Architecture Board Pack</div>
-          <div class="board-pack-banner-sub">VP1–VP6 · Decision-ready · Architecture Review Board</div>
-        </div>
-      </div>`
-    : '';
+  // ── GENERATE ──
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    const topic = document.getElementById('topicInput').value.trim();
+    if (!topic) { alert('Please enter a topic.'); return; }
+    if (selected.size === 0) { alert('Please select at least one agent.'); return; }
 
-  list.innerHTML = banner + artefacts.map((a, i) => {
-    const [iconClass, emoji] = ARTEFACT_ICONS[a.type] || ['icon-gov', '📄'];
-    const isNew = a.metadata && latestRequestId && a.metadata.requestId === latestRequestId;
-    const ghUrl = `https://github.com/ZenCloudAU/velocity-architecture/tree/main/artefacts/${a.type}`;
-    const chars = a.contentLength || (a.content ? a.content.length : 0);
-    const tokens = a.metadata ? a.metadata.tokensUsed : 0;
-    const newBadge = isNew ? '<span style="font-size:10px;color:#16A34A;font-weight:600;font-family:\'JetBrains Mono\',monospace;margin-left:4px">● new</span>' : '';
-    return `<div class="artefact-item">
-        <div class="artefact-left">
-          <div class="artefact-icon ${iconClass}">${emoji}</div>
-          <div style="min-width:0">
-            <div class="artefact-name">${ARTEFACT_LABELS[a.type]}${newBadge}</div>
-            <div class="artefact-meta">${chars.toLocaleString()} chars · ${tokens.toLocaleString()} tokens · ${a.metadata ? new Date(a.metadata.timestamp).toLocaleTimeString() : ''}</div>
+    const context = document.getElementById('contextInput').value.trim();
+    const constraintsRaw = document.getElementById('constraintsInput').value.trim();
+    const constraints = constraintsRaw ? constraintsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const requestedArtefacts = [...selected];
+
+    // UI: hide agent panel, show progress
+    document.getElementById('agentPanel').classList.add('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('resultsSection').classList.add('hidden');
+    document.getElementById('errorBanner').classList.add('hidden');
+    document.getElementById('progressSection').classList.remove('hidden');
+    document.getElementById('generateBtn').disabled = true;
+
+    // Build progress list
+    const progressAgents = document.getElementById('progressAgents');
+    progressAgents.innerHTML = requestedArtefacts.map(type => {
+      const def = AGENT_DEFS[type];
+      return `<div class="progress-agent" id="progress-${type}">
+        <div class="progress-dot" id="dot-${type}"></div>
+        <span class="progress-agent-name">${def.icon} ${def.label}</span>
+        <span class="progress-agent-status" id="status-${type}">waiting</span>
+      </div>`;
+    }).join('');
+
+    updateProgress(0, requestedArtefacts.length);
+
+    try {
+      // Mark first as running
+      setAgentStatus(requestedArtefacts[0], 'running');
+
+      const res = await fetch('/artefacts/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, context, constraints, requestedArtefacts })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Mark all done
+      requestedArtefacts.forEach(t => setAgentStatus(t, 'done'));
+      updateProgress(requestedArtefacts.length, requestedArtefacts.length);
+
+      // Render results
+      artefacts = data.artefacts || [];
+      setTimeout(() => {
+        document.getElementById('progressSection').classList.add('hidden');
+        renderResults(data);
+      }, 600);
+
+    } catch (err) {
+      requestedArtefacts.forEach(t => setAgentStatus(t, 'error'));
+      showError(err.message || 'Generation failed');
+      document.getElementById('generateBtn').disabled = false;
+    }
+  });
+
+  function setAgentStatus(type, status) {
+    const dot = document.getElementById(`dot-${type}`);
+    const st = document.getElementById(`status-${type}`);
+    if (!dot) return;
+    dot.className = `progress-dot ${status}`;
+    if (status === 'running') st.textContent = 'generating…';
+    else if (status === 'done') st.textContent = 'done';
+    else if (status === 'error') st.textContent = 'error';
+  }
+
+  function updateProgress(done, total) {
+    document.getElementById('progressCount').textContent = `${done} / ${total}`;
+    document.getElementById('progressBar').style.width = total ? `${(done/total)*100}%` : '0%';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBanner');
+    el.textContent = `Error: ${msg}`;
+    el.classList.remove('hidden');
+    document.getElementById('progressSection').classList.add('hidden');
+    document.getElementById('agentPanel').classList.remove('hidden');
+  }
+
+  // ── RENDER RESULTS ──
+  function renderResults(data) {
+    const section = document.getElementById('resultsSection');
+    const list = document.getElementById('artefactsList');
+    const meta = document.getElementById('resultsMeta');
+
+    meta.textContent = `${data.artefactCount} artefact${data.artefactCount !== 1 ? 's' : ''} · ${data.duration || ''}ms`;
+
+    list.innerHTML = (data.artefacts || []).map((a, i) => {
+      const def = AGENT_DEFS[a.type] || { icon: '📄', label: a.type };
+      const ts = a.metadata?.generatedAt ? new Date(a.metadata.generatedAt).toLocaleTimeString() : '';
+      const chars = a.contentPreview?.length || 0;
+      const tokens = a.metadata?.tokens || Math.round(chars / 4);
+      const ghBase = 'https://github.com/ZenCloudAU/velocity-architecture/tree/main/artefacts';
+      const ghFolder = a.type;
+      return `
+      <div class="artefact-card" id="artefact-${i}">
+        <div class="artefact-header" onclick="toggleArtefact(${i})">
+          <span class="artefact-type-icon">${def.icon}</span>
+          <div class="artefact-info">
+            <div class="artefact-name">${def.label}</div>
+            <div class="artefact-stats">${chars.toLocaleString()} chars · ~${tokens.toLocaleString()} tokens${ts ? ' · ' + ts : ''}</div>
+          </div>
+          <div class="artefact-actions">
+            <button class="btn-sm" onclick="event.stopPropagation(); viewRaw(${i})">Raw</button>
+            <a class="btn-sm" href="${ghBase}/${ghFolder}" target="_blank" onclick="event.stopPropagation()">GitHub ↗</a>
           </div>
         </div>
-        <div class="artefact-actions">
-          <button class="btn-sm" onclick="viewArtefact(${i})">👁 View</button>
-          <button class="btn-sm" data-copy-idx="${i}" onclick="copyArtefact(${i})">⎘ Copy</button>
-          <button class="btn-sm" onclick="downloadArtefact(${i})">↓ .md</button>
-          <a class="btn-sm github" href="${ghUrl}" target="_blank">⌥ GitHub</a>
+        <div class="artefact-body" id="body-${i}">
+          <div id="rendered-${i}">${renderMarkdown(a.contentPreview || '')}</div>
         </div>
       </div>`;
-  }).join('');
-}
+    }).join('');
 
-// ── COPY / DOWNLOAD ───────────────────────────────────────────────────────────
-async function copyArtefact(i) {
-  const a = artefacts[i];
-  try {
-    await navigator.clipboard.writeText(a.content || a.contentPreview || '');
-    const btn = document.querySelector(`[data-copy-idx="${i}"]`);
-    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied'; setTimeout(() => { btn.textContent = orig; }, 1500); }
-  } catch (e) { showAlert('Copy failed. Try viewing the artefact and copying manually.', 'error'); }
-}
+    section.classList.remove('hidden');
 
-async function copyAllArtefacts() {
-  const text = artefacts.map(a =>
-    `# ${ARTEFACT_LABELS[a.type]}\n\n${a.content || a.contentPreview || ''}`
-  ).join('\n\n---\n\n');
-  try {
-    await navigator.clipboard.writeText(text);
-    const btn = document.getElementById('copy-all-btn');
-    btn.innerHTML = '✓ Copied all';
-    setTimeout(() => { btn.innerHTML = '⎘ Copy all'; }, 2000);
-  } catch (e) { showAlert('Copy failed.', 'error'); }
-}
-
-function downloadArtefact(i) {
-  const a = artefacts[i];
-  const slugs = { governance: 'vp1-guardrail-canvas', strategy: 'vp2-tradeoff-matrix', design: 'vp3-adr', velocity: 'vp4-velocity-dashboard', rhythm: 'vp5-pulse-system', practitioner: 'vp6-integrity-arc' };
-  const blob = new Blob([a.content || a.contentPreview || ''], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url; link.download = `${slugs[a.type] || a.type}.md`; link.click();
-  URL.revokeObjectURL(url);
-}
-
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-function viewArtefact(i) {
-  const a = artefacts[i];
-  const raw = a.contentPreview || a.content || '';
-  const truncated = a.contentLength && raw.length < a.contentLength;
-  const el = document.getElementById('modal-content');
-  el.innerHTML = marked.parse(raw || '_No content available. View full artefact on GitHub._');
-  if (truncated) {
-    const note = document.createElement('div');
-    note.className = 'modal-truncated';
-    note.textContent = `Showing first ${raw.length.toLocaleString()} of ${a.contentLength.toLocaleString()} chars — full artefact committed to GitHub.`;
-    el.appendChild(note);
+    // Show back button
+    const backHtml = `<div style="margin-bottom:20px">
+      <button class="btn-sm" style="font-size:12px;padding:8px 14px" onclick="showAgents()">← New Request</button>
+    </div>`;
+    list.insertAdjacentHTML('beforebegin', backHtml);
   }
-  document.getElementById('modal-title').textContent = ARTEFACT_LABELS[a.type];
-  document.getElementById('modal').classList.add('show');
-}
 
-async function copyModalContent() {
-  const el = document.getElementById('modal-content');
-  const btn = document.getElementById('modal-copy-btn');
-  try {
-    await navigator.clipboard.writeText(el.innerText);
-    btn.textContent = '✓ Copied';
-    setTimeout(() => { btn.textContent = '⎘ Copy'; }, 1500);
-  } catch (e) { btn.textContent = 'Failed'; setTimeout(() => { btn.textContent = '⎘ Copy'; }, 1500); }
-}
+  function toggleArtefact(i) {
+    const body = document.getElementById(`body-${i}`);
+    body.classList.toggle('open');
+  }
 
-function closeModal(e) {
-  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('show');
-}
+  function viewRaw(i) {
+    const a = artefacts[i];
+    if (!a) return;
+    const win = window.open('', '_blank');
+    win.document.write(`<pre style="font-family:monospace;white-space:pre-wrap;padding:20px;background:#0a0c10;color:#e8ecf4;">${(a.contentPreview || '').replace(/</g,'&lt;')}</pre>`);
+  }
 
-// ── EXPORT REPORT ─────────────────────────────────────────────────────────────
-function exportReport() {
-  if (artefacts.length === 0) { showAlert('Generate artefacts first.', 'error'); return; }
-
-  const topic = document.getElementById('topic').value.trim();
-  const context = document.getElementById('context').value.trim();
-  const constraints = getConstraints();
-  const ts = new Date();
-  const dateStr = ts.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
-  const timeStr = ts.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
-  const badge = document.getElementById('quality-badge');
-  const quality = badge ? badge.textContent : null;
-
-  let md = boardPackMode
-    ? `# Architecture Board Pack\n\n> Prepared for architecture review board / steering committee governance review\n\n`
-    : `# VAF Architecture Report\n\n`;
-
-  md += `**Date:** ${dateStr} · ${timeStr}  \n`;
-  md += `**Framework:** VAF v2 · ISO/IEC/IEEE 42010:2022  \n`;
-  md += `**Generated by:** VAF Agentic Architect — ZenCloud Global Consultants  \n`;
-  if (boardPackMode) md += `**Pack:** Architecture Board Pack (VP1–VP6)  \n`;
-  md += `\n---\n\n`;
-
-  md += `## Architecture Brief\n\n`;
-  if (topic) md += `**Challenge:** ${topic}\n\n`;
-  if (context) md += `**Context:**\n\n${context}\n\n`;
-  if (constraints.length > 0) md += `**Constraints:** ${constraints.join(', ')}\n\n`;
-  if (quality) md += `**Brief quality:** ${quality}\n\n`;
-
-  md += `---\n\n## Generated Artefacts\n\n`;
-
-  const ORDER = ['governance', 'strategy', 'design', 'velocity', 'rhythm', 'practitioner'];
-  const sorted = [...artefacts].sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
-
-  sorted.forEach(a => {
-    md += `---\n\n### ${ARTEFACT_LABELS[a.type]}\n\n`;
-    const content = a.content || a.contentPreview || '';
-    md += content ? content + '\n\n' : '_Full content committed to GitHub repository._\n\n';
-  });
-
-  md += `---\n\n*Generated by VAF Agentic Architect · velocityarchitectureframework.com*\n`;
-
-  const blob = new Blob([md], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  const slug = topic ? topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) : 'report';
-  link.href = url;
-  link.download = boardPackMode ? `vaf-board-pack-${slug}.md` : `vaf-report-${slug}.md`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-document.getElementById('topic').addEventListener('input', scoreBrief);
-document.getElementById('context').addEventListener('input', scoreBrief);
-document.getElementById('constraints-custom').addEventListener('input', scoreBrief);
+  function showAgents() {
+    document.getElementById('agentPanel').classList.remove('hidden');
+    document.getElementById('resultsSection').classList.add('hidden');
+    document.getElementById('generateBtn').disabled = selected.size === 0;
+  }
 </script>
 </body>
 </html>

@@ -1,118 +1,71 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { EARequest, Artefact, VAFFramework } from '../types/index';
+import Anthropic from '@anthropic-ai/sdk';
+import { loadVAFFramework } from '../kb-loader';
+import { EARequest, ArtefactType } from '../types/index';
 import { logger } from '../logger';
 
 const client = new Anthropic();
 
+// Handles: data-architecture, integration-map, technology-radar, risk-register, tech-debt-dashboard, and legacy 'velocity'
 export const velocityAgent = {
-  async generate(request: EARequest, framework: VAFFramework): Promise<Artefact> {
-    const startTime = Date.now();
-    const systemPrompt = buildSystemPrompt(framework);
+  async generate(req: EARequest, type: ArtefactType, label: string): Promise<string> {
+    const fw = await loadVAFFramework();
+    logger.info({ type, label }, 'Velocity agent generating');
 
-    try {
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate a Velocity Dashboard and Architectural Decision Log (ADL) index (VP4) for the following engagement:
+    const typeInstructions: Record<string, string> = {
+      'data-architecture': `Generate a Data Architecture Blueprint artefact.
+Structure: Executive Summary, Data Domain Map (key domains with owners), Data Governance Model, Data Quality Standards, Master Data Management Approach, Data Lineage (key flows), Privacy and Classification Framework, Tooling and Platform Decisions, Data Debt Inventory, Roadmap.
+Be specific about ownership, standards, and tooling choices.`,
 
-Topic: ${request.topic}
+      'integration-map': `Generate an Integration Architecture artefact covering the integration landscape.
+Structure: Executive Summary, Integration Principles, Current Integration Inventory, Integration Patterns (approved for use), API Governance Model, Event-Driven vs Request-Response boundaries, Key Integration Flows (described with sequence), Dependency Map, Technical Debt in Integration, Target State Integration Platform.
+Name the actual integration technologies and patterns.`,
 
-Context: ${request.context || 'No additional context provided.'}
+      'technology-radar': `Generate a Technology Radar artefact for the domain.
+Structure: Executive Summary, Radar Summary Table (Adopt/Trial/Assess/Hold per technology), Languages & Frameworks section, Tools section, Platforms section, Techniques section, Changes from Last Quarter, Decision Rationale for each entry, Governance Implications.
+Each entry: name, ring, rationale, constraints or conditions.`,
 
-Constraints: ${request.constraints?.join(', ') || 'No constraints provided.'}
+      'risk-register': `Generate an Architectural Risk Register artefact.
+Structure: Executive Summary, Risk Inventory (each with: ID, description, type, likelihood H/M/L, impact H/M/L, decision latency date, owner, mitigation), Overdue Items (past latency date), Risk Heat Map (narrative), Top 3 Risks requiring immediate action, Risk Velocity Trend.
+Be specific. Name the risks. Don't use generic descriptions.`,
 
-Requirements:
-1. Follow the VP4 Velocity Viewpoint structure exactly
-2. Generate both components: ADL Index and Velocity Dashboard as one combined artefact
-3. Populate every field with content specific to the stated topic — no blank placeholders, no template variables
-4. Apply the 14-Day Decision Aging Rule (CR-E1), ownership map (CR-O2), and expiry discipline (CR-X1)
-5. Identify domain-specific decision areas and health signals relevant to this engagement context
-6. Set a concrete velocity signal based on a realistic reading of the described context
-7. Use forensic, control-surface tone — this is a command post, not a report
-8. Format as valid Markdown
-9. Do not include preamble or explanation; output the artefact only`,
-          },
-        ],
-      });
+      'tech-debt-dashboard': `Generate a Technical Debt Dashboard artefact.
+Structure: Executive Summary, Debt Inventory (by category: Architecture/Code/Data/Infrastructure/Test), Debt Severity Assessment (each item: description, age, remediation cost estimate, risk if unaddressed), Debt Heat Map by system, Prioritised Remediation Roadmap (quarterly), Backlog Metrics, Debt Velocity Trend.
+Be specific about what the debt is and what it costs.`,
 
-      const content = response.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from Claude');
-      }
+      'velocity': `Generate a VP4 Velocity Dashboard and ADL Index following the VAF framework specification.
+Structure: Decision Health Summary, ADL Index, Open Decisions, Recently Superseded, Velocity Score, Trend.`,
+    };
 
-      const artefact: Artefact = {
-        id: `${request.id}-velocity`,
-        type: 'velocity',
-        content: content.text,
-        metadata: {
-          requestId: request.id,
-          generatedBy: 'velocity-agent',
-          timestamp: new Date(),
-          vafVersion: '2.0.0',
-          tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-          validationPassed: false,
-        },
-      };
+    const instruction = typeInstructions[type] || typeInstructions['velocity'];
 
-      logger.info(
-        { requestId: request.id, type: artefact.type, tokens: artefact.metadata.tokensUsed, durationMs: Date.now() - startTime },
-        'Velocity artefact generated'
-      );
+    const systemPrompt = `You are the VAF Agentic Architect — an ISO 42010:2022 conformant enterprise architecture agent.
+You produce precise, control-surface artefacts. Every item is specific, owned, and actionable.
+Framework Spec:
+${fw.spec}
+VP4 Velocity Viewpoint:
+${fw.viewpoints.vp4}
+Correspondence Rules:
+${fw.correspondenceRules}
+Example:
+${fw.examples.velocity}`;
 
-      return artefact;
-    } catch (error) {
-      logger.error(
-        { requestId: request.id, error: error instanceof Error ? error.message : String(error) },
-        'Velocity artefact generation failed'
-      );
-      throw error;
-    }
+    const userPrompt = `${instruction}
+
+Topic: ${req.topic}
+${req.context ? `Context: ${req.context}` : ''}
+${req.constraints?.length ? `Constraints: ${req.constraints.join(', ')}` : ''}
+
+Produce the complete ${label} now. Use Markdown formatting. Minimum 800 words. Be specific to the topic.`;
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const content = response.content[0];
+    if (content.type !== 'text') throw new Error('Unexpected response type');
+    return content.text;
   },
 };
-
-function buildSystemPrompt(framework: VAFFramework): string {
-  return `You are the Velocity Agent for the Velocity Architecture Framework (VAF) v2.
-
-Your role: Generate VP4 artefacts — the Architectural Decision Log (ADL) index and Velocity Dashboard — that make decision movement visible and governable for a specific engagement context.
-
-## VAF Framework Context
-
-### Framework Specification
-${framework.spec.slice(0, 5000)}...
-
-### Viewpoint 4: Velocity (Architectural Control)
-${framework.viewpoints.vp4?.slice(0, 3000) || 'Not available'}...
-
-### Correspondence Rules (Must Comply)
-${framework.correspondenceRules.slice(0, 3000)}...
-
-### Foundation Layer (Guiding Principles)
-${framework.foundation.slice(0, 2000)}...
-
-### Reference Instrument
-${framework.examples.velocity?.slice(0, 2000) || 'Not available'}...
-
-## Your Constraints
-
-1. **Tone:** Forensic, control-surface. This is a command post reading, not a status update or report.
-2. **Structure:** Always generate both the ADL Index and the Velocity Dashboard as a combined VP4 artefact.
-3. **VAF Concepts:** Apply Decision Latency, 14-Day Decision Aging Rule (CR-E1), Ownership Map (CR-O2), and Expiry Discipline (CR-X1).
-4. **No blank fields:** Every field must be populated with content derived from the topic and context. No YYYY-MM-DD placeholders, no empty cells.
-5. **Output:** Valid Markdown only. No preamble. The artefact is your output.
-6. **Context specificity:** Derive plausible, realistic domain-specific content from the topic and context. Name actual decision domains, realistic decision owners (by role), and concrete health signals for this type of engagement.
-
-## Generation Rules
-
-- Structure the ADL to reflect the architecture layers present in the stated context (enterprise, solution, technical).
-- Identify 4–6 realistic decision domains from the topic and populate the heat map accordingly with domain-appropriate entries.
-- Populate the Decision Velocity Metrics with plausible week-on-week readings that reflect a realistic engagement of this type.
-- Set the velocity signal to a concrete level (High / Moderate / Low / Stalled) with a brief rationale.
-- Name ownership gaps explicitly — state the role that should hold the decision, not "TBD".
-- Populate the risk inventory with 2–3 realistic risks relevant to the stated engagement context.
-- Identify at least one fitness function relevant to this engagement context.
-- If you cannot generate a compliant artefact, explain why and fail loudly.`;
-}

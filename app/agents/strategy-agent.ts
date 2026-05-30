@@ -1,124 +1,63 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { EARequest, Artefact, VAFFramework } from '../types/index';
+import Anthropic from '@anthropic-ai/sdk';
+import { loadVAFFramework } from '../kb-loader';
+import { EARequest, ArtefactType } from '../types/index';
 import { logger } from '../logger';
 
 const client = new Anthropic();
 
+// Handles: trade-off-matrix, portfolio-roadmap, solution-review, and legacy 'strategy'
 export const strategyAgent = {
-  async generate(request: EARequest, framework: VAFFramework): Promise<Artefact> {
-    const startTime = Date.now();
+  async generate(req: EARequest, type: ArtefactType, label: string): Promise<string> {
+    const fw = await loadVAFFramework();
+    logger.info({ type, label }, 'Strategy agent generating');
 
-    const systemPrompt = buildSystemPrompt(framework);
+    const typeInstructions: Record<string, string> = {
+      'trade-off-matrix': `Generate a comprehensive VP2 Trade-off Matrix artefact.
+Structure: Decision Context, Evaluation Criteria (5-8 with weights summing to 100%), Options Considered (minimum 3), Scoring Matrix (1-5 per criterion per option), Weighted Scores, Recommendation with Reasoning, Rejected Options, Consequences.
+Show the full matrix in a Markdown table. Be explicit about what was traded away.`,
 
-    try {
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate a Trade-off Matrix (VP2) for the following enterprise strategy challenge:
+      'portfolio-roadmap': `Generate a Portfolio Roadmap artefact covering the application portfolio.
+Structure: Executive Summary, Current Portfolio Assessment (categorise: Invest/Maintain/Migrate/Retire), Portfolio Heat Map, Rationalisation Opportunities, TCO Analysis, 3-Year Roadmap (quarterly milestones), Investment Priorities, Risk Summary.
+Be specific about technology, cost, and timeline implications.`,
 
-Topic: ${request.topic}
+      'solution-review': `Generate a Solution Review Report artefact — an architectural quality assessment.
+Structure: Executive Summary, Solution Overview, Architecture Assessment (against VAF guardrails), Quality Attribute Analysis (availability, security, scalability, maintainability, performance), Compliance Check, Issues and Recommendations (P1/P2/P3 prioritised), Decision Points Requiring Escalation.
+Be specific about what passes, what fails, and what needs attention.`,
 
-Context: ${request.context || 'No additional context provided.'}
+      'strategy': `Generate a VP2 Trade-off Matrix artefact following the VAF framework specification.
+Structure: Decision Context, Criteria and Weights, Options, Scoring, Recommendation, Consequences.`,
+    };
 
-Constraints: ${request.constraints?.join(', ') || 'No constraints provided.'}
+    const instruction = typeInstructions[type] || typeInstructions['strategy'];
 
-Requirements:
-1. Follow the ISO 42010 Trade-off Matrix structure exactly
-2. Use narrative-driven, evidence-based tone
-3. Include: Decision Options, Trade-offs, Sequencing Rationale, Investment Profile
-4. Align with governance artefact if provided (same request)
-5. Reference VAF concepts (Decision Latency, Velocity of Truth, Integrity Gap)
-6. Format as valid Markdown
-7. Do not include preamble or explanation; output the artefact only`,
-          },
-        ],
-      });
+    const systemPrompt = `You are the VAF Agentic Architect — an ISO 42010:2022 conformant enterprise architecture agent.
+You produce forensic, declarative artefacts with no hedging. Every recommendation is specific and traceable.
+Framework Spec:
+${fw.spec}
+VP2 Decision Viewpoint:
+${fw.viewpoints.vp2}
+Correspondence Rules:
+${fw.correspondenceRules}
+Example:
+${fw.examples.strategy}`;
 
-      const content = response.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from Claude');
-      }
+    const userPrompt = `${instruction}
 
-      const artefact: Artefact = {
-        id: `${request.id}-strategy`,
-        type: 'strategy',
-        content: content.text,
-        metadata: {
-          requestId: request.id,
-          generatedBy: 'strategy-agent',
-          timestamp: new Date(),
-          vafVersion: '2.0.0',
-          tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-          validationPassed: false,
-        },
-      };
+Topic: ${req.topic}
+${req.context ? `Context: ${req.context}` : ''}
+${req.constraints?.length ? `Constraints: ${req.constraints.join(', ')}` : ''}
 
-      const duration = Date.now() - startTime;
-      logger.info(
-        {
-          requestId: request.id,
-          type: artefact.type,
-          tokens: artefact.metadata.tokensUsed,
-          durationMs: duration,
-        },
-        'Strategy artefact generated'
-      );
+Produce the complete ${label} now. Use Markdown formatting. Minimum 800 words. Be specific to the topic.`;
 
-      return artefact;
-    } catch (error) {
-      logger.error(
-        {
-          requestId: request.id,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        'Strategy artefact generation failed'
-      );
-      throw error;
-    }
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const content = response.content[0];
+    if (content.type !== 'text') throw new Error('Unexpected response type');
+    return content.text;
   },
 };
-
-function buildSystemPrompt(framework: VAFFramework): string {
-  return `You are the Strategy Agent for the Velocity Architecture Framework (VAF) v2.
-
-Your role: Generate strategic artefacts (Trade-off Matrix — VP2) that establish decision sequencing and investment priorities.
-
-## VAF Framework Context
-
-### Framework Specification
-${framework.spec.slice(0, 5000)}...
-
-### Viewpoint 2: Decision (Strategy)
-${framework.viewpoints.vp2?.slice(0, 3000) || 'Not available'}...
-
-### Correspondence Rules (Must Comply)
-${framework.correspondenceRules.slice(0, 3000)}...
-
-### Foundation Layer (Guiding Principles)
-${framework.foundation.slice(0, 2000)}...
-
-### Reference Example
-${framework.examples.strategy?.slice(0, 2000) || 'Not available'}...
-
-## Your Constraints
-
-1. **Tone:** Narrative-driven, evidence-based, reasoning transparent.
-2. **Structure:** Always follow VP2 (Trade-off Matrix) structure.
-3. **VAF Concepts:** Apply Decision Latency, Velocity of Truth, Integrity Gap, Sequencing Rationale.
-4. **Alignment:** Must align with governance artefact (VP1) from same request when available.
-5. **Output:** Valid Markdown only. No preamble. The artefact is your output.
-6. **Quality:** Match the style of the reference example.
-
-## Generation Rules
-
-- Identify trade-offs explicitly. Show costs and benefits.
-- Provide sequencing rationale (why this order of decisions).
-- Quantify investment profiles where possible (cost, effort, risk).
-- Assess decision latency (how quickly can each decision be implemented).
-- If alignment with governance is impossible, flag the contradiction.
-- If you cannot generate a compliant artefact, explain why and fail loudly.`;
-}

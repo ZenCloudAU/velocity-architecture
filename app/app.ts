@@ -1,16 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import express, { Express, Request, Response, NextFunction } from 'express';
 import path from 'path';
 import { orchestrator } from './orchestrator';
 import { logger } from './logger';
-import { EARequest } from './types/index';
+import { EARequest, ArtefactType } from './types/index';
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   logger.info({ method: req.method, path: req.path }, 'Incoming request');
@@ -24,12 +23,19 @@ app.get('/', (req: Request, res: Response) => {
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString(), version: '2.0.0' });
+  res.json({ status: 'healthy', timestamp: new Date().toISOString(), version: '4.0.0' });
 });
 
 // Status
 app.get('/status', (req: Request, res: Response) => {
-  res.json({ status: 'operational', version: '2.0.0', environment: process.env.NODE_ENV || 'development', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'operational',
+    version: '4.0.0',
+    agents: 16,
+    viewpoints: 6,
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Generate EA artefacts
@@ -42,15 +48,20 @@ app.post('/artefacts/generate', async (req: Request, res: Response) => {
       return;
     }
 
+    if (!requestedArtefacts || requestedArtefacts.length === 0) {
+      res.status(400).json({ error: 'requestedArtefacts must be a non-empty array' });
+      return;
+    }
+
     const requestId = `req-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-    logger.info({ requestId, topic, userId: userId || 'anonymous' }, 'EA generation requested');
+    logger.info({ requestId, topic, userId: userId || 'anonymous', artefacts: requestedArtefacts }, 'EA generation requested');
 
     const eaRequest: EARequest = {
       id: requestId,
       topic,
       context,
       constraints,
-      requestedArtefacts: requestedArtefacts || ['governance', 'strategy', 'design', 'velocity', 'rhythm', 'practitioner'],
+      requestedArtefacts: requestedArtefacts as ArtefactType[],
       userId: userId || 'anonymous',
       timestamp: new Date(),
     };
@@ -65,7 +76,7 @@ app.post('/artefacts/generate', async (req: Request, res: Response) => {
         id: a.id,
         type: a.type,
         metadata: a.metadata,
-        contentPreview: a.content.slice(0, 1000),
+        contentPreview: a.content,
         contentLength: a.content.length,
       })),
       errors: result.errors,
@@ -74,13 +85,11 @@ app.post('/artefacts/generate', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error({ error }, 'Generation request failed');
-    res.status(500).json({ error: 'Generation failed', message: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({
+      error: 'Generation failed',
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
-});
-
-// Retrieve artefact
-app.get('/artefacts/:id', async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented', message: 'Retrieve from GitHub directly' });
 });
 
 // 404
@@ -89,7 +98,7 @@ app.use((req: Request, res: Response) => {
 });
 
 const server = app.listen(port, () => {
-  logger.info({ port }, 'VAF Agentic Architect v2 listening');
+  logger.info({ port, version: '4.0.0', agents: 16 }, 'VAF Agentic Architect v4 listening');
 });
 
 process.on('SIGTERM', () => { server.close(() => process.exit(0)); });

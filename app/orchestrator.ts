@@ -1,145 +1,108 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { EARequest, TaskPlan, OrchestratorState, Artefact, VAFFramework } from './types/index';
 import { governanceAgent } from './agents/governance-agent';
 import { strategyAgent } from './agents/strategy-agent';
 import { designAgent } from './agents/design-agent';
 import { velocityAgent } from './agents/velocity-agent';
 import { rhythmAgent } from './agents/rhythm-agent';
 import { practitionerAgent } from './agents/practitioner-agent';
-import { validationAgent } from './agents/validation-agent';
-import { actionEngine } from './action-engine';
-import { loadVAFFramework } from './kb-loader';
+import { EARequest, EAResponse, Artefact, ArtefactType } from './types/index';
 import { logger } from './logger';
 
-class Orchestrator {
-  private client = new Anthropic();
-  private framework: VAFFramework | null = null;
+// Maps all 16 agent types to a base generator + context label
+const AGENT_ROUTING: Record<ArtefactType, { generator: string; label: string; githubFolder: string }> = {
+  // Strategic EA
+  'guardrail-canvas':      { generator: 'governance',    label: 'VP1 Guardrail Canvas',        githubFolder: 'governance'    },
+  'trade-off-matrix':      { generator: 'strategy',      label: 'VP2 Trade-off Matrix',         githubFolder: 'strategy'      },
+  'capability-map':        { generator: 'governance',    label: 'Capability Map',               githubFolder: 'governance'    },
+  'portfolio-roadmap':     { generator: 'strategy',      label: 'Portfolio Roadmap',            githubFolder: 'strategy'      },
+  // Architecture Design
+  'domain-model':          { generator: 'design',        label: 'Domain Model',                 githubFolder: 'design'        },
+  'data-architecture':     { generator: 'velocity',      label: 'Data Architecture Blueprint',  githubFolder: 'design'        },
+  'application-blueprint': { generator: 'design',        label: 'Application Blueprint',        githubFolder: 'design'        },
+  'integration-map':       { generator: 'velocity',      label: 'Integration Map',              githubFolder: 'design'        },
+  'technology-radar':      { generator: 'velocity',      label: 'Technology Radar',             githubFolder: 'governance'    },
+  // Governance & Assurance
+  'compliance-report':     { generator: 'practitioner',  label: 'Compliance Report',            githubFolder: 'governance'    },
+  'risk-register':         { generator: 'velocity',      label: 'Risk Register',                githubFolder: 'governance'    },
+  'tech-debt-dashboard':   { generator: 'velocity',      label: 'Technical Debt Dashboard',     githubFolder: 'design'        },
+  'adr':                   { generator: 'design',        label: 'VP3 ADR',                      githubFolder: 'design'        },
+  // Delivery & Value
+  'solution-review':       { generator: 'strategy',      label: 'Solution Review Report',       githubFolder: 'strategy'      },
+  'spec-validation':       { generator: 'practitioner',  label: 'Spec Validation Report',       githubFolder: 'design'        },
+  'integrity-arc':         { generator: 'practitioner',  label: 'VP6 Integrity Arc',            githubFolder: 'practitioner'  },
+  'value-dashboard':       { generator: 'rhythm',        label: 'Value Dashboard',              githubFolder: 'governance'    },
+  // Legacy aliases
+  'governance':            { generator: 'governance',    label: 'VP1 Guardrail Canvas',        githubFolder: 'governance'    },
+  'strategy':              { generator: 'strategy',      label: 'VP2 Trade-off Matrix',         githubFolder: 'strategy'      },
+  'design':                { generator: 'design',        label: 'VP3 ADR',                      githubFolder: 'design'        },
+  'velocity':              { generator: 'velocity',      label: 'VP4 Velocity Dashboard',       githubFolder: 'governance'    },
+  'rhythm':                { generator: 'rhythm',        label: 'VP5 Pulse System',             githubFolder: 'governance'    },
+  'practitioner':          { generator: 'practitioner',  label: 'VP6 Integrity Arc',            githubFolder: 'practitioner'  },
+};
 
-  async execute(request: EARequest): Promise<OrchestratorState> {
-    const state: OrchestratorState = {
-      requestId: request.id,
-      phase: 'planning',
-      artefacts: [],
-      errors: [],
-      startTime: new Date(),
+const GENERATORS: Record<string, (req: EARequest, type: ArtefactType, label: string) => Promise<string>> = {
+  governance:   (req, type, label) => governanceAgent.generate(req, type, label),
+  strategy:     (req, type, label) => strategyAgent.generate(req, type, label),
+  design:       (req, type, label) => designAgent.generate(req, type, label),
+  velocity:     (req, type, label) => velocityAgent.generate(req, type, label),
+  rhythm:       (req, type, label) => rhythmAgent.generate(req, type, label),
+  practitioner: (req, type, label) => practitionerAgent.generate(req, type, label),
+};
+
+export const orchestrator = {
+  async execute(req: EARequest): Promise<EAResponse> {
+    const start = Date.now();
+    logger.info({ requestId: req.id, artefacts: req.requestedArtefacts }, 'Orchestrator executing');
+
+    const artefacts: Artefact[] = [];
+    const errors: string[] = [];
+
+    // Parallel generation across all requested types
+    const tasks = req.requestedArtefacts.map(async (type) => {
+      const routing = AGENT_ROUTING[type];
+      if (!routing) {
+        errors.push(`Unknown artefact type: ${type}`);
+        return;
+      }
+
+      const generator = GENERATORS[routing.generator];
+      if (!generator) {
+        errors.push(`No generator for: ${type}`);
+        return;
+      }
+
+      try {
+        const content = await generator(req, type, routing.label);
+        artefacts.push({
+          id: `${req.id}-${type}`,
+          type,
+          content,
+          metadata: {
+            generatedAt: new Date().toISOString(),
+            tokens: Math.round(content.length / 4),
+            model: 'claude-sonnet-4-6',
+            viewpoint: routing.label,
+            githubPath: `artefacts/${routing.githubFolder}`,
+          },
+        });
+        logger.info({ type, label: routing.label }, 'Artefact generated');
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        errors.push(`${type}: ${msg}`);
+        logger.error({ type, error: msg }, 'Agent failed');
+      }
+    });
+
+    await Promise.allSettled(tasks);
+
+    const duration = Date.now() - start;
+    logger.info({ requestId: req.id, count: artefacts.length, errors: errors.length, duration }, 'Orchestration complete');
+
+    return {
+      requestId: req.id,
+      phase: 'complete',
+      artefacts,
+      errors,
+      duration,
     };
-
-    try {
-      logger.info({ requestId: request.id }, 'Phase: Loading VAF Framework');
-      if (!this.framework) {
-        this.framework = await loadVAFFramework();
-      }
-
-      logger.info({ requestId: request.id }, 'Phase: Planning');
-      state.phase = 'planning';
-      const plan = await this.createPlan(request);
-
-      if (!plan || !plan.artefactsNeeded || plan.artefactsNeeded.length === 0) {
-        state.errors.push('Planning failed: no artefacts identified');
-        state.phase = 'failed';
-        return state;
-      }
-
-      logger.info({ requestId: request.id, artefactsNeeded: plan.artefactsNeeded }, 'Phase: Generation');
-      state.phase = 'generation';
-
-      const results = await Promise.all(
-        plan.artefactsNeeded.map(async (artefactType) => {
-          try {
-            return await this.generateArtefact(request, artefactType);
-          } catch (error) {
-            state.errors.push(`Generation failed for ${artefactType}: ${error instanceof Error ? error.message : String(error)}`);
-            return null;
-          }
-        })
-      );
-      state.artefacts = results.filter((a): a is NonNullable<typeof a> => a !== null);
-
-      if (state.artefacts.length === 0) {
-        state.phase = 'failed';
-        return state;
-      }
-
-      logger.info({ requestId: request.id, artefactCount: state.artefacts.length }, 'Phase: Validation');
-      state.phase = 'validation';
-
-      for (const artefact of state.artefacts) {
-        try {
-          const isValid = await validationAgent.validate(artefact, this.framework, state.artefacts);
-          if (!isValid) {
-            state.errors.push(`Validation failed for ${artefact.type}`);
-          }
-        } catch (error) {
-          state.errors.push(`Validation error for ${artefact.type}: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      }
-
-      logger.info({ requestId: request.id, artefactCount: state.artefacts.length }, 'Phase: Publishing');
-      state.phase = 'publishing';
-
-      for (const artefact of state.artefacts) {
-        try {
-          const result = await actionEngine.commitArtefact(request.id, artefact);
-          logger.info(
-            { requestId: request.id, type: artefact.type, sha: result.sha, url: result.url },
-            'Artefact committed to GitHub'
-          );
-        } catch (error) {
-          state.errors.push(`Commit failed for ${artefact.type}: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      }
-
-      state.phase = 'complete';
-      state.endTime = new Date();
-      state.duration = state.endTime.getTime() - state.startTime.getTime();
-
-      logger.info(
-        { requestId: request.id, artefactCount: state.artefacts.length, durationMs: state.duration, errors: state.errors.length },
-        'Request complete'
-      );
-
-      return state;
-    } catch (error) {
-      state.phase = 'failed';
-      state.errors.push(`Orchestration failed: ${error instanceof Error ? error.message : String(error)}`);
-      state.endTime = new Date();
-      state.duration = state.endTime.getTime() - state.startTime.getTime();
-      logger.error({ requestId: request.id, error, duration: state.duration }, 'Request failed');
-      return state;
-    }
-  }
-
-  private async createPlan(request: EARequest): Promise<TaskPlan> {
-    try {
-      const requestedArtefacts = request.requestedArtefacts || ['governance', 'strategy', 'design', 'velocity', 'rhythm', 'practitioner'];
-      const plan: TaskPlan = {
-        requestId: request.id,
-        artefactsNeeded: requestedArtefacts,
-        validationRules: ['structure', 'tone', 'alignment', 'vaf-concepts'],
-        sequenceOrder: ['governance', 'strategy', 'design', 'velocity', 'rhythm', 'practitioner'],
-      };
-      return plan;
-    } catch (error) {
-      logger.error({ error }, 'Plan creation failed');
-      throw error;
-    }
-  }
-
-  private async generateArtefact(request: EARequest, type: string): Promise<Artefact | null> {
-    if (!this.framework) throw new Error('VAF framework not loaded');
-
-    switch (type) {
-      case 'governance':   return governanceAgent.generate(request, this.framework);
-      case 'strategy':     return strategyAgent.generate(request, this.framework);
-      case 'design':       return designAgent.generate(request, this.framework);
-      case 'velocity':     return velocityAgent.generate(request, this.framework);
-      case 'rhythm':       return rhythmAgent.generate(request, this.framework);
-      case 'practitioner': return practitionerAgent.generate(request, this.framework);
-      default:
-        logger.warn({ type }, 'Unknown artefact type');
-        return null;
-    }
-  }
-}
-
-export const orchestrator = new Orchestrator();
+  },
+};

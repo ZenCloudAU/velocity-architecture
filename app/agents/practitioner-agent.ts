@@ -1,120 +1,63 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { EARequest, Artefact, VAFFramework } from '../types/index';
+import Anthropic from '@anthropic-ai/sdk';
+import { loadVAFFramework } from '../kb-loader';
+import { EARequest, ArtefactType } from '../types/index';
 import { logger } from '../logger';
 
 const client = new Anthropic();
 
+// Handles: compliance-report, spec-validation, integrity-arc, and legacy 'practitioner'
 export const practitionerAgent = {
-  async generate(request: EARequest, framework: VAFFramework): Promise<Artefact> {
-    const startTime = Date.now();
-    const systemPrompt = buildSystemPrompt(framework);
+  async generate(req: EARequest, type: ArtefactType, label: string): Promise<string> {
+    const fw = await loadVAFFramework();
+    logger.info({ type, label }, 'Practitioner agent generating');
 
-    try {
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate an Integrity Arc assessment (VP6) for the practitioner operating in the following engagement:
+    const typeInstructions: Record<string, string> = {
+      'compliance-report': `Generate a Compliance Report artefact — an architectural compliance assessment.
+Structure: Executive Summary, Compliance Scope (standards and policies assessed), Assessment Findings (each finding: requirement, status Pass/Fail/Partial, evidence, remediation required), Policy Violations Register, Exception Register, Regulatory Mapping (requirements to architecture controls), Compliance Score, Remediation Roadmap, Sign-off Requirements.
+Be specific. Name the requirements. Name the violations.`,
 
-Topic: ${request.topic}
+      'spec-validation': `Generate a Spec Validation Report artefact — a requirements traceability and completeness assessment.
+Structure: Executive Summary, Specification Inventory (all requirements listed), Traceability Matrix (requirement → architecture component → test evidence), Completeness Assessment (what is missing), Consistency Check (where requirements conflict), Assumption Register (what the spec assumes but doesn't state), Risk from Gaps, Recommended Additions, Acceptance Recommendation.
+Be exhaustive about what is and isn't covered.`,
 
-Context: ${request.context || 'No additional context provided.'}
+      'integrity-arc': `Generate a VP6 Integrity Arc artefact — an architect's self-assessment of operating integrity on this engagement.
+Structure: Engagement Context, Integrity Assessment across five positions (Authorship — are recommendations yours?, Boundaries — are scope lines held?, Refusal — what was declined and why?, Staying — is there a reason to stay?, Exit — what would trigger withdrawal), Sacred Cows (assumptions being carried that haven't been challenged), Analytic Tests (five integrity questions answered honestly), Velocity Signal (overall integrity rating 1-10 with rationale), Corrective Intent.
+Be forensic. This is a practitioner instrument, not a client document.`,
 
-Constraints: ${request.constraints?.join(', ') || 'No constraints provided.'}
+      'practitioner': `Generate a VP6 Integrity Arc artefact following the VAF framework specification.
+Structure: Five integrity positions, Sacred Cows, Analytic Tests, Velocity Signal.`,
+    };
 
-Requirements:
-1. Follow the VP6 Practitioner Viewpoint structure exactly
-2. Generate the complete Integrity Arc: all five positions assessed, Sacred Cows Register, Analytic Tests, and Velocity Signal
-3. Assess each position (Authorship, Boundaries, Refusal, Staying, Exit) in the context of this specific engagement — state clearly what is present, what is absent, and what the conditions are
-4. Populate the Sacred Cows Register with 2–4 beliefs specific to this type of engagement that protect dysfunction over clarity
-5. Answer every Analytic Test question with a concrete, context-specific reading
-6. Set the Velocity Signal to a specific level with a one-sentence rationale drawn from the engagement description
-7. Use honest, direct, practitioner-to-practitioner tone — no hedging, no performance of professionalism
-8. Format as valid Markdown
-9. Do not include preamble or explanation; output the artefact only`,
-          },
-        ],
-      });
+    const instruction = typeInstructions[type] || typeInstructions['practitioner'];
 
-      const content = response.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from Claude');
-      }
+    const systemPrompt = `You are the VAF Agentic Architect — an ISO 42010:2022 conformant enterprise architecture agent.
+You produce practitioner-grade artefacts with unflinching honesty. These are instruments for serious architects.
+Framework Spec:
+${fw.spec}
+VP6 Practitioner Viewpoint:
+${fw.viewpoints.vp6}
+Correspondence Rules:
+${fw.correspondenceRules}
+Example:
+${fw.examples.practitioner}`;
 
-      const artefact: Artefact = {
-        id: `${request.id}-practitioner`,
-        type: 'practitioner',
-        content: content.text,
-        metadata: {
-          requestId: request.id,
-          generatedBy: 'practitioner-agent',
-          timestamp: new Date(),
-          vafVersion: '2.0.0',
-          tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-          validationPassed: false,
-        },
-      };
+    const userPrompt = `${instruction}
 
-      logger.info(
-        { requestId: request.id, type: artefact.type, tokens: artefact.metadata.tokensUsed, durationMs: Date.now() - startTime },
-        'Practitioner artefact generated'
-      );
+Topic: ${req.topic}
+${req.context ? `Context: ${req.context}` : ''}
+${req.constraints?.length ? `Constraints: ${req.constraints.join(', ')}` : ''}
 
-      return artefact;
-    } catch (error) {
-      logger.error(
-        { requestId: request.id, error: error instanceof Error ? error.message : String(error) },
-        'Practitioner artefact generation failed'
-      );
-      throw error;
-    }
+Produce the complete ${label} now. Use Markdown formatting. Minimum 800 words. Be specific to the topic.`;
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const content = response.content[0];
+    if (content.type !== 'text') throw new Error('Unexpected response type');
+    return content.text;
   },
 };
-
-function buildSystemPrompt(framework: VAFFramework): string {
-  return `You are the Practitioner Agent for the Velocity Architecture Framework (VAF) v2.
-
-Your role: Generate VP6 artefacts — the Integrity Arc — that assess the practitioner's position and establish what they are and are not accountable for in a specific engagement. This is the human layer of the framework.
-
-## VAF Framework Context
-
-### Framework Specification
-${framework.spec.slice(0, 5000)}...
-
-### Viewpoint 6: Practitioner (Human Layer)
-${framework.viewpoints.vp6?.slice(0, 3000) || 'Not available'}...
-
-### Correspondence Rules (Must Comply)
-${framework.correspondenceRules.slice(0, 3000)}...
-
-### Foundation Layer (Guiding Principles)
-${framework.foundation.slice(0, 2000)}...
-
-### Reference Instrument
-${framework.examples.practitioner?.slice(0, 2000) || 'Not available'}...
-
-## Your Constraints
-
-1. **Tone:** Honest, direct, practitioner-to-practitioner. No hedging. No performance of professionalism. State what is true.
-2. **Structure:** Always generate all sections: Engagement Context, all five arc positions assessed, Sacred Cows Register, Analytic Tests, and Velocity Signal.
-3. **VAF Concepts:** Apply Authorship vs facilitation, Boundaries as written declarations, Refusal as a precise act, Staying as provisional assessment, Exit as a clean architectural decision.
-4. **No blank fields:** Every field must be populated with content specific to the engagement. No "TBD" or template placeholders.
-5. **Output:** Valid Markdown only. No preamble. The artefact is your output.
-6. **Context specificity:** The assessment must read as specific to this type of engagement — not a generic integrity framework. Name the actual conditions, pressures, and sacred cows present in this kind of work.
-
-## Generation Rules
-
-- For each arc position, state clearly whether it is present or absent in this engagement context, and name the specific condition that determines this.
-- For Authorship: identify whether the described context creates conditions for it or structurally prevents it, and state why.
-- For Boundaries: write the scope declaration as if you are the practitioner — what you will and will not own.
-- For Refusal: identify at least one specific piece of work this engagement is likely to demand that the practitioner should not produce without a prior decision.
-- For Staying: assess the staying conditions honestly based on the engagement description. If the conditions for meaningful work are absent, say so.
-- For Exit: assess whether exit conditions are approaching, reached, or not yet relevant. Do not soften this assessment.
-- Sacred Cows Register: name the specific organisational beliefs in this type of engagement that will resist clarity. Be direct — these are the beliefs that protect dysfunction.
-- Analytic Tests: answer each question with a concrete reading, not a neutral observation.
-- Velocity Signal: set it to one of the four levels (High / Moderate / Low / Stalled) with a one-sentence rationale.
-- If you cannot generate a compliant artefact, explain why and fail loudly.`;
-}
