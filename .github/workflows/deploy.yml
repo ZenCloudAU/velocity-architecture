@@ -62,7 +62,7 @@ jobs:
             --registry-password "$GH_TOKEN_VAL" \
             --ports 80 \
             --ip-address Public \
-            --dns-name-label vaf-architect \
+            --dns-name-label vaf-agentic-architect \
             --location ${{ env.LOCATION }} \
             --os-type Linux \
             --cpu 1 \
