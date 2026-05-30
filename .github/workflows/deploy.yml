@@ -1,3 +1,4 @@
+# Redeploy: apply dns-name-label vaf-agentic-architect
 name: Build and Deploy
 
 on:
