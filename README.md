@@ -207,8 +207,5 @@ Environment files such as `.env` should remain local and must not be committed.
 
 ## License
 
-The repository includes a `LICENSE` file with the MIT License.
-
-Additional framework and research usage terms are present in repository licence materials. Review `LICENCE-TERMS.md` and `assets/LICENCE.md` before reusing the Velocity Architecture Framework name, research material, or methodology in a public or commercial context.
-
-Velocity Architecture Framework(TM) is identified in the repository materials as a ZenCloud Global Consultants framework/trademark.
+Licensed under CC BY 4.0. See LICENSE.md for terms.
+Velocity Architecture Framework™ is a trademark of ZenCloud Consulting (Class 42).
