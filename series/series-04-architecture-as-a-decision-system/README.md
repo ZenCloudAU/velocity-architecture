@@ -1,15 +1,14 @@
 # Series 4 — Architecture as a Decision System
 
-Series 4 establishes the core Velocity Architecture argument:
-architecture is not fundamentally a documentation practice. It is a decision system.
+This series examines how architecture evolves from a documentation and governance discipline into a functioning decision system embedded in delivery, authority, constraints, and organisational design.
 
-The series examines the structural gap between architectural intent and delivery reality, introducing:
+## Articles
 
-- Constraint clarity
-- Authority design
-- Deviation visibility
-- Decision latency
-- Repository failure modes
-- Architectural leverage
+- [4.1 — Architecture as a Decision System](./4.1-architecture-as-a-decision-system.md)
+- [4.2 — The Repository Trap](./4.2-the-repository-trap.md)
+- [4.3 — Authority Design](./4.3-authority-design.md)
+- [4.4 — Constraint Infrastructure](./4.4-constraint-infrastructure.md)
+- [4.5 — Deviation Visibility](./4.5-deviation-visibility.md)
+- [4.6 — Organisational Architecture](./4.6-organisational-architecture.md)
 
-This series forms the theoretical foundation for Series 5.
+Published as part of the Velocity Architecture series.
