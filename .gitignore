@@ -24,3 +24,36 @@ Thumbs.db
 # Temporary
 .temp/
 tmp/
+# Operating-system files
+Desktop.ini
+# Editor files
+# Local environment files
+!.env.example
+# Credentials and keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.token
+*secret*
+*secrets*
+*credential*
+*credentials*
+# Local caches and temporary work
+.cache/
+.tmp/
+__pycache__/
+*.pyc
+# Generated archives and exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.pdf
+# Common dependency folders and build outputs
+build/
+coverage/
