@@ -13,7 +13,9 @@
       "Bash(grep -E \"^series$|^signals-series$\")",
       "Bash(python3 -c ' *)",
       "Bash(python3 *)",
-      "Bash(bash *)"
+      "Bash(bash *)",
+      "WebFetch(domain:velocityarchitectureframework.com)",
+      "WebFetch(domain:www.zencloud.com.au)"
     ]
   }
 }
