@@ -5,14 +5,14 @@ Canonical URLs for the ZenCloud ecosystem. This is the source of truth for cross
 ## Hosting terminology
 
 - **Origin** is the platform that publishes or runs the site.
-- **Edge** is the DNS, TLS, redirect, proxy, caching, or security layer in front of the origin.
+- **Edge** is the DNS, TLS, redirect, caching, or security layer in front of the origin.
 - **Canonical URL** is the URL public navigation, metadata, and publishing guidance should promote.
 
 ## Canonical URLs
 
 | Repo | Canonical URL | Origin | Edge | Status |
 |------|--------------|--------|------|--------|
-| velocity-architecture | `https://velocityarchitectureframework.com/` | Conflicting repository evidence: GitHub Pages static estate and Azure Container application | Cloudflare | Canonical URL known; live origin and route split require verification |
+| velocity-architecture | `https://velocityarchitectureframework.com/` | GitHub Pages from `main` repository root | Cloudflare | Live — framework, articles and publications |
 | velocity-academy | `https://velocityarchitecture.com.au/` | GitHub Pages or Cloudflare Pages — verify project configuration | Cloudflare | Live — custom domain |
 | zencloud-advisory | `https://www.zencloud.com.au/` | Cloudflare Pages | Cloudflare | Active |
 | studiosix | `https://studiosix.com.au/` | GitHub Pages | Cloudflare | Live — custom domain |
@@ -28,32 +28,25 @@ Canonical URLs for the ZenCloud ecosystem. This is the source of truth for cross
 | trading-dashboard | `https://zencloudau.github.io/trading-dashboard/` | GitHub Pages | GitHub Pages | Live |
 | pmi-portal | `https://zencloudau.github.io/pmi-portal/` | GitHub Pages | GitHub Pages | Verify canonical production status |
 
-## Velocity application routes
+## Velocity publication-site scope
 
-Two different entry assumptions currently exist:
+`velocityarchitectureframework.com` is the canonical public site for:
 
-```text
-Static-site navigation: https://velocityarchitectureframework.com/app/portal.html
-Express application:     https://velocityarchitectureframework.com/
-```
+- the framework homepage;
+- research papers;
+- article series;
+- publications;
+- guides;
+- diagnostics;
+- templates;
+- specifications;
+- examples and viewpoints.
 
-The Azure application serves the portal at `/`, while the static site links to `/app/portal.html`. The intended route must be selected and implemented consistently.
+Azure container and application experiments in the same repository are separate concerns and are not part of the article-site origin or availability assessment.
 
-The portal submits generation requests to:
+## Alternate URLs
 
-```text
-POST /artefacts/generate
-```
-
-That endpoint requires the Azure application origin or an explicit Cloudflare proxy route. It cannot execute on GitHub Pages.
-
-## Retired or redirected URLs
-
-Do not declare a URL retired until the live DNS and redirect behaviour have been verified.
-
-Proposed canonical destination:
-
-| Alternate URL | Intended canonical destination |
+| Alternate URL | Canonical destination |
 |---------|-----------------------|
 | `https://zencloudau.github.io/velocity-architecture/` | `https://velocityarchitectureframework.com/` |
 | `https://zencloudau.github.io/velocity-academy/` | `https://velocityarchitecture.com.au/` |
@@ -72,11 +65,11 @@ og:title
 og:description
 ```
 
-The canonical and Open Graph URLs must use the canonical domain recorded above after live route verification.
+Canonical and Open Graph URLs must use the custom domain recorded above.
 
 ## Change control
 
-A URL or origin change is not complete until the following are updated together:
+A public URL or content-origin change is not complete until the following are updated together:
 
 - this registry;
 - repository README and deployment documentation;
@@ -85,7 +78,7 @@ A URL or origin change is not complete until the following are updated together:
 - sitemap and robots directives;
 - source-to-route registry;
 - compatibility redirects or pages;
-- Cloudflare DNS, redirect, Worker, and origin rules;
-- public acceptance-test results.
+- Cloudflare DNS and redirect rules where applicable;
+- public route validation.
 
 *Reviewed: 2026-06-08. See `CHANGE-PROTOCOL.md` and `docs/public-site-content-location-review.md`.*
