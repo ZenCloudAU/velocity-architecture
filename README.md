@@ -4,22 +4,22 @@ Velocity Architecture Framework is a decision-first architecture framework and t
 
 This repository is the source of truth for the framework, its practitioner material, public publications, reference artefacts, and the Velocity Agentic Architect application.
 
-- **Framework site:** [velocityarchitectureframework.com](https://velocityarchitectureframework.com)
-- **Reader-facing publication site:** [zencloudau.github.io/velocity-architecture](https://zencloudau.github.io/velocity-architecture/)
+- **Public site:** [velocityarchitectureframework.com](https://velocityarchitectureframework.com)
+- **Source repository:** [github.com/ZenCloudAU/velocity-architecture](https://github.com/ZenCloudAU/velocity-architecture)
 
 ## Start Here
 
 | Need | Location |
 |---|---|
-| Understand the framework | [Framework home](https://zencloudau.github.io/velocity-architecture/) |
-| Navigate the publication estate | [Public site map](https://zencloudau.github.io/velocity-architecture/site-map.html) |
-| Read research | [Research library](https://zencloudau.github.io/velocity-architecture/research/) |
+| Understand the framework | [Framework home](https://velocityarchitectureframework.com/) |
+| Navigate the publication estate | [Public site map](https://velocityarchitectureframework.com/site-map.html) |
+| Read research | [Research library](https://velocityarchitectureframework.com/research/) |
 | Review the formal specification | [`spec/`](spec/) |
 | Browse viewpoints and correspondence rules | [`viewpoints/`](viewpoints/) and [`correspondence-rules/`](correspondence-rules/) |
 | Use practitioner guidance and templates | [`guides/`](guides/) and [`templates/`](templates/) |
 | Inspect the application | [`app/`](app/) |
 
-GitHub holds the canonical source. The GitHub Pages site is the reader-facing publication layer.
+GitHub holds the canonical source. The custom domain is the reader-facing publication layer, backed by GitHub Pages and served through Cloudflare.
 
 ## Repository Role
 
@@ -74,7 +74,7 @@ Generated and reference outputs are held under `artefacts/`. Templates and worke
 
 ## Public Site and Publishing
 
-The repository also contains a static publication estate. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
+The repository also contains a static publication estate served at `velocityarchitectureframework.com`. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
 
 Relevant areas include:
 
@@ -84,7 +84,7 @@ Relevant areas include:
 - `.github/workflows/` — deployment, publication, and repository checks;
 - `docs/` — deployment, continuity, and operational documentation.
 
-Public source and generated publication output should remain distinguishable. Generated pages should not become a second source of truth for framework content.
+Public source and generated publication output should remain distinguishable. Generated pages should not become a second source of truth for framework content. Existing public routes must remain stable when source documents are relocated.
 
 ## Local Development
 
@@ -124,6 +124,7 @@ The application uses port `3000` by default. Environment variables and safe plac
 - Treat generated artefacts as outputs, not automatically accepted architecture decisions.
 - Preserve human review and professional accountability for AI-assisted outputs.
 - Keep framework source, generated publication output, application code, and operational evidence clearly separated.
+- Preserve public custom-domain routes when moving canonical source files.
 - Update cross-repository links through the ecosystem registry and change protocol.
 - Use `main` as the source of truth unless a release process explicitly states otherwise.
 
@@ -133,11 +134,11 @@ See [`AI_AND_CLIENT_DATA_USAGE_POLICY.md`](AI_AND_CLIENT_DATA_USAGE_POLICY.md), 
 
 Active and evolving.
 
-The repository now operates as a combined framework authority, publication estate, and architecture tooling codebase. Current maintenance priorities are structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, and alignment of version and licensing metadata.
+The repository now operates as a combined framework authority, publication estate, and architecture tooling codebase. Current maintenance priorities are structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, preservation of public routes, and alignment of version and licensing metadata.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). Changes should preserve framework traceability, distinguish source from generated output, and avoid duplicating canonical material across directories.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Changes should preserve framework traceability, distinguish source from generated output, avoid duplicating canonical material across directories, and validate public routes before relocation.
 
 ## Licence and Trademark
 
