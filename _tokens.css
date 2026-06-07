@@ -1,6 +1,6 @@
-:root {
+﻿:root {
   --color-primary: #0F1E2E;
-  --color-accent: #00B4D8;
+  --color-accent: #E8630A;
   --color-surface: #F8FAFC;
   --color-panel: #1A2B3C;
   --color-text-primary: #0F1E2E;
@@ -20,9 +20,9 @@
   --radius-lg: 12px;
   /* remap site orange vars to ecosystem accent */
   --orange: var(--color-accent);
-  --orange-hover: #0096B4;
-  --orange-subtle: rgba(0,180,216,0.08);
-  --orange-border: rgba(0,180,216,0.3);
+  --orange-hover: #CC5508;
+  --orange-subtle: #FFF7ED;
+  --orange-border: #FED7AA;
 }
 
 .ecosystem-strip {
