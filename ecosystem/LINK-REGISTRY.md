@@ -6,13 +6,13 @@ Canonical URLs for the ZenCloud ecosystem. This is the source of truth for cross
 
 - **Origin** is the platform that publishes or runs the site.
 - **Edge** is the DNS, TLS, redirect, proxy, caching, or security layer in front of the origin.
-- **Canonical URL** is the only URL that public navigation, metadata, and publishing guidance should promote.
+- **Canonical URL** is the URL public navigation, metadata, and publishing guidance should promote.
 
 ## Canonical URLs
 
 | Repo | Canonical URL | Origin | Edge | Status |
 |------|--------------|--------|------|--------|
-| velocity-architecture | `https://velocityarchitectureframework.com/` | GitHub Pages from `main` repository root | Cloudflare | Live — custom domain; route-sensitive root deployment |
+| velocity-architecture | `https://velocityarchitectureframework.com/` | Conflicting repository evidence: GitHub Pages static estate and Azure Container application | Cloudflare | Canonical URL known; live origin and route split require verification |
 | velocity-academy | `https://velocityarchitecture.com.au/` | GitHub Pages or Cloudflare Pages — verify project configuration | Cloudflare | Live — custom domain |
 | zencloud-advisory | `https://www.zencloud.com.au/` | Cloudflare Pages | Cloudflare | Active |
 | studiosix | `https://studiosix.com.au/` | GitHub Pages | Cloudflare | Live — custom domain |
@@ -28,25 +28,32 @@ Canonical URLs for the ZenCloud ecosystem. This is the source of truth for cross
 | trading-dashboard | `https://zencloudau.github.io/trading-dashboard/` | GitHub Pages | GitHub Pages | Live |
 | pmi-portal | `https://zencloudau.github.io/pmi-portal/` | GitHub Pages | GitHub Pages | Verify canonical production status |
 
-## Velocity Agent Entry Point
+## Velocity application routes
 
-The currently published static entry route is:
+Two different entry assumptions currently exist:
 
 ```text
-https://velocityarchitectureframework.com/app/portal.html
+Static-site navigation: https://velocityarchitectureframework.com/app/portal.html
+Express application:     https://velocityarchitectureframework.com/
 ```
 
-All agent launch links must point to this route rather than the bare domain.
+The Azure application serves the portal at `/`, while the static site links to `/app/portal.html`. The intended route must be selected and implemented consistently.
 
-This route is served as static HTML by the public site. It must only be described as operational when its API requests are confirmed to reach a live backend through the deployed routing model.
+The portal submits generation requests to:
 
-Site navigation back-links may link to the bare canonical domain.
+```text
+POST /artefacts/generate
+```
+
+That endpoint requires the Azure application origin or an explicit Cloudflare proxy route. It cannot execute on GitHub Pages.
 
 ## Retired or redirected URLs
 
-These URLs are not canonical. Update all live links to the current canonical destination.
+Do not declare a URL retired until the live DNS and redirect behaviour have been verified.
 
-| Old URL | Canonical destination |
+Proposed canonical destination:
+
+| Alternate URL | Intended canonical destination |
 |---------|-----------------------|
 | `https://zencloudau.github.io/velocity-architecture/` | `https://velocityarchitectureframework.com/` |
 | `https://zencloudau.github.io/velocity-academy/` | `https://velocityarchitecture.com.au/` |
@@ -54,7 +61,7 @@ These URLs are not canonical. Update all live links to the current canonical des
 
 ## Public metadata standard
 
-Every index and article page intended for public discovery should carry:
+Every public index and article page should carry:
 
 ```text
 <title>
@@ -65,13 +72,11 @@ og:title
 og:description
 ```
 
-The canonical and Open Graph URLs must use the canonical domain recorded above.
-
-The current repository confirms these fields for selected entry points, but the full publication estate still requires a generated metadata audit.
+The canonical and Open Graph URLs must use the canonical domain recorded above after live route verification.
 
 ## Change control
 
-A URL change is not complete until the following are updated together:
+A URL or origin change is not complete until the following are updated together:
 
 - this registry;
 - repository README and deployment documentation;
@@ -80,6 +85,7 @@ A URL change is not complete until the following are updated together:
 - sitemap and robots directives;
 - source-to-route registry;
 - compatibility redirects or pages;
-- Cloudflare redirect rules where applicable.
+- Cloudflare DNS, redirect, Worker, and origin rules;
+- public acceptance-test results.
 
 *Reviewed: 2026-06-08. See `CHANGE-PROTOCOL.md` and `docs/public-site-content-location-review.md`.*
