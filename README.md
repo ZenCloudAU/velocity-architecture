@@ -19,7 +19,7 @@ This repository is the source of truth for the framework, its practitioner mater
 | Use practitioner guidance and templates | [`guides/`](guides/) and [`templates/`](templates/) |
 | Inspect the application | [`app/`](app/) |
 
-GitHub holds the canonical source. The custom domain is the reader-facing publication layer, backed by GitHub Pages and served through Cloudflare.
+GitHub holds the canonical source. The repository currently contains both a GitHub Pages static-site configuration and an Azure Container deployment behind Cloudflare. The live origin and route split must be verified before either deployment model is treated as authoritative.
 
 ## Repository Role
 
@@ -65,7 +65,7 @@ Primary endpoints:
 
 | Method | Route | Purpose |
 |---|---|---|
-| `GET` | `/` | Portal UI |
+| `GET` | `/` | Portal UI on the application origin |
 | `GET` | `/health` | Runtime health |
 | `GET` | `/status` | Runtime and capability status |
 | `POST` | `/artefacts/generate` | Generate requested architecture artefacts |
@@ -74,17 +74,19 @@ Generated and reference outputs are held under `artefacts/`. Templates and worke
 
 ## Public Site and Publishing
 
-The repository also contains a static publication estate served at `velocityarchitectureframework.com`. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
+The repository contains a static publication estate intended for `velocityarchitectureframework.com`. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
 
 Relevant areas include:
 
 - `scripts/` — publishing and repository utility scripts;
 - `design-system/` and `assets/` — shared visual and brand resources;
-- root and section-level HTML — GitHub Pages publication surfaces;
-- `.github/workflows/` — deployment, publication, and repository checks;
+- root and section-level HTML — static publication surfaces;
+- `.github/workflows/` — Azure application deployment and repository checks;
 - `docs/` — deployment, continuity, and operational documentation.
 
 Public source and generated publication output should remain distinguishable. Generated pages should not become a second source of truth for framework content. Existing public routes must remain stable when source documents are relocated.
+
+The static publication origin and the application API origin should be explicitly separated or governed by documented Cloudflare routing.
 
 ## Local Development
 
@@ -125,6 +127,7 @@ The application uses port `3000` by default. Environment variables and safe plac
 - Preserve human review and professional accountability for AI-assisted outputs.
 - Keep framework source, generated publication output, application code, and operational evidence clearly separated.
 - Preserve public custom-domain routes when moving canonical source files.
+- Document the static-site origin, API origin, and Cloudflare routing explicitly.
 - Update cross-repository links through the ecosystem registry and change protocol.
 - Use `main` as the source of truth unless a release process explicitly states otherwise.
 
@@ -134,7 +137,7 @@ See [`AI_AND_CLIENT_DATA_USAGE_POLICY.md`](AI_AND_CLIENT_DATA_USAGE_POLICY.md), 
 
 Active and evolving.
 
-The repository now operates as a combined framework authority, publication estate, and architecture tooling codebase. Current maintenance priorities are structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, preservation of public routes, and alignment of version and licensing metadata.
+The repository now operates as a combined framework authority, publication estate, and architecture tooling codebase. Current maintenance priorities are resolving the public deployment topology, structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, preservation of public routes, and alignment of version and licensing metadata.
 
 ## Contributing
 
