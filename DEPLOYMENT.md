@@ -2,40 +2,24 @@
 
 Canonical public URL: https://velocityarchitectureframework.com/
 
-## Current repository evidence
+## Public site
 
-The repository contains two deployment models:
+The framework, articles, research, guides, templates, and publication library are delivered as a static GitHub Pages site.
 
-1. **Static publication estate**
-   - GitHub Pages configuration in `_config.yml`;
-   - custom-domain declaration in `CNAME`;
-   - root and section-level HTML routes.
+- Source branch: `main`
+- Pages source: repository root
+- Custom domain: declared in `CNAME`
+- DNS and edge: Cloudflare
+- Canonical content source: this repository
 
-2. **Agent application**
-   - container deployment through `.github/workflows/deploy.yml`;
-   - Azure Container Instances origin;
-   - Cloudflare proxy instructions in `PHASE5_RUNBOOK.md`;
-   - Express endpoints for `/`, `/health`, `/status`, and `/artefacts/generate`.
+Repository paths for rendered HTML are public routes. Route-entry files and source-backed reader documents must not be relocated without updating links, readers, build manifests, and compatibility routes.
 
-The repository does not establish which origin currently receives the custom domain or whether Cloudflare splits routes between the two origins.
+## Separate application artefacts
 
-## Consequence
-
-- GitHub Pages can serve the static framework and publications but cannot execute the agent API.
-- The Azure container can serve the agent portal and API but does not package or serve the complete static publication estate.
-
-Do not describe the service as fully operational until DNS and Cloudflare routing are inspected and all public routes pass an acceptance test.
-
-## Required target
-
-Use either:
-
-- separate static and API domains; or
-- documented Cloudflare path routing between a static origin and the Azure API origin.
+The Azure container and related TypeScript application files are separate from the public article and publication-site delivery model. They should be documented and maintained independently and must not be used to assess whether the static article site is operational.
 
 Related material:
 
 - `docs/deployment-map.md`
 - `docs/public-site-content-location-review.md`
 - `ecosystem/LINK-REGISTRY.md`
-- `PHASE5_RUNBOOK.md`
