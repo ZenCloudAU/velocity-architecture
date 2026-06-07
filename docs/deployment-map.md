@@ -1,91 +1,107 @@
 # ZenCloudAU Deployment Map
 
-This document defines the deployment model for the ZenCloudAU / Velocity Architecture ecosystem.
+This document records the deployment model for the ZenCloudAU / Velocity Architecture ecosystem.
 
 ## Deployment Principles
 
-1. Source files and generated build files should be kept separate where practical.
-2. Cloudflare Pages is used for commercial or primary brand surfaces where recorded below.
-3. GitHub Pages is used for static learning assets, tools, demos, and public reference sites.
-4. Cloudflare may provide DNS, TLS, redirects, caching, or edge services in front of an origin platform; the origin and edge roles must be recorded separately.
-5. Each repository should declare:
-   - purpose;
-   - source of truth;
-   - origin/deployment target;
-   - DNS and edge provider;
-   - canonical production URL;
-   - build command;
-   - output directory;
-   - owner role in the ecosystem.
+1. Source files and generated build files should be separate.
+2. Canonical URL, origin, DNS/edge provider, build command, and output directory must be recorded independently.
+3. Cloudflare may provide DNS, TLS, redirects, caching, security, or path routing without being the application origin.
+4. A service must not be declared operational until its public routes and APIs pass acceptance tests.
 
-## Cloudflare Pages Sites
+## Velocity Architecture — unresolved topology
 
-| Repo | Role | Production URL | Build Command | Output | Status |
+Canonical URL:
+
+```text
+https://velocityarchitectureframework.com/
+```
+
+Repository evidence currently describes two different origins:
+
+| Layer | Repository evidence | Capability |
+|---|---|---|
+| Static publication estate | `CNAME`, `_config.yml`, root and section-level HTML | Framework, research, guides, publications and public readers |
+| Agent application | `.github/workflows/deploy.yml`, `Dockerfile`, `nginx.conf`, `app/app.ts`, `PHASE5_RUNBOOK.md` | Portal, health/status endpoints and artefact generation API |
+
+The live Cloudflare DNS target and any path-routing rules must be inspected before the active topology can be declared.
+
+### Static-origin limitation
+
+GitHub Pages can serve the publication estate but cannot execute:
+
+```text
+GET /health
+GET /status
+POST /artefacts/generate
+```
+
+### Azure-origin limitation
+
+The Azure container packages the compiled application and `app/portal.html`, but not the full static website. Express serves the portal at `/` and returns JSON 404 responses for unimplemented routes. It therefore cannot serve the full publication estate as currently built.
+
+### Required production model
+
+Preferred:
+
+```text
+velocityarchitectureframework.com      -> static site origin
+api.velocityarchitectureframework.com  -> Azure application origin
+```
+
+Alternative:
+
+```text
+/artefacts/*, /health, /status -> Azure
+all other routes               -> static origin
+```
+
+The alternative requires documented Cloudflare routing or a reverse proxy that is version-controlled and tested.
+
+## Other Ecosystem Sites
+
+| Repo | Role | Canonical URL | Origin | Edge | Status |
 |---|---|---|---|---|---|
-| zencloud-advisory | Commercial advisory site | https://www.zencloud.com.au/ | npm run build | dist | Active main-dev project |
-| velocity-academy | Learning hub | https://velocityarchitecture.com.au/ | Static / Cloudflare Pages | root | Verify production deployment freshness |
-| studiosix | Product/media studio | https://studiosix.com.au/ | npm run build | dist | Active |
-| pmi-portal | PMO / delivery governance workspace | TBD | npm run build | dist | Confirm production URL |
-| ea-artefact-generator | EA artefact tooling | https://ea.velocityarchitecture.com.au/ | npm run build | dist | Active |
+| zencloud-advisory | Commercial advisory site | https://www.zencloud.com.au/ | Cloudflare Pages | Cloudflare | Active |
+| velocity-academy | Learning hub | https://velocityarchitecture.com.au/ | Verify | Cloudflare | Verify deployment freshness |
+| studiosix | Product/media studio | https://studiosix.com.au/ | GitHub Pages | Cloudflare | Active |
+| ea-artefact-generator | EA artefact tooling | https://ea.velocityarchitecture.com.au/ | GitHub Pages | Cloudflare | Active |
+| vaf-sa | Solution architecture method | https://zencloudau.github.io/vaf-sa/ | GitHub Pages | GitHub Pages | Active |
+| vsf-match | Career readiness tool | https://zencloudau.github.io/vsf-match/ | GitHub Actions Pages | GitHub Pages | Active |
+| vaf-python-zero-to-hero | Python course | https://zencloudau.github.io/vaf-python-zero-to-hero/ | GitHub Pages | GitHub Pages | Active |
+| vaf-typescript-zero-to-hero | TypeScript course | https://zencloudau.github.io/vaf-typescript-zero-to-hero/ | GitHub Pages | GitHub Pages | Active |
+| learn-with-claude | AI-assisted coding path | https://zencloudau.github.io/learn-with-claude/ | GitHub Pages | GitHub Pages | Active |
+| SAPEACertification | SAP EA certification | https://zencloudau.github.io/SAPEACertification/ | GitHub Pages | GitHub Pages | Active |
+| AzureSACertification | Azure SA certification | https://zencloudau.github.io/AzureSACertification/ | GitHub Pages | GitHub Pages | Active |
+| CISSPCertification | CISSP certification | https://zencloudau.github.io/CISSPCertification/ | GitHub Pages | GitHub Pages | Active |
 
-## GitHub Pages Sites
+## Velocity Acceptance Test
 
-| Repo | Role | Canonical Production URL | Origin Model | Edge | Status |
-|---|---|---|---|---|---|
-| velocity-architecture | Framework authority and publication estate | https://velocityarchitectureframework.com/ | GitHub Pages from `main` repository root | Cloudflare | Active; route-sensitive root deployment |
-| vaf-sa | Solution architecture method | https://zencloudau.github.io/vaf-sa/ | GitHub Pages static | GitHub Pages | Active |
-| vsf-match | Career readiness tool | https://zencloudau.github.io/vsf-match/ | GitHub Actions Pages | GitHub Pages | Active; review generated asset strategy |
-| trading-dashboard | Personal / educational trading lab | https://zencloudau.github.io/trading-dashboard/ | GitHub Pages static | GitHub Pages | Active lab asset |
-| vaf-python-zero-to-hero | Python course | https://zencloudau.github.io/vaf-python-zero-to-hero/ | GitHub Pages static | GitHub Pages | Active course |
-| vaf-typescript-zero-to-hero | TypeScript course | https://zencloudau.github.io/vaf-typescript-zero-to-hero/ | GitHub Pages / docs redirect | GitHub Pages | Active course |
-| learn-with-claude | AI-assisted coding learning path | https://zencloudau.github.io/learn-with-claude/ | GitHub Pages static | GitHub Pages | Active |
-| SAPEACertification | SAP EA certification study hub | https://zencloudau.github.io/SAPEACertification/ | GitHub Pages static | GitHub Pages | Active |
-| AzureSACertification | Azure SA certification study hub | https://zencloudau.github.io/AzureSACertification/ | GitHub Pages static | GitHub Pages | Active |
-| CISSPCertification | CISSP certification study hub | https://zencloudau.github.io/CISSPCertification/ | GitHub Pages static | GitHub Pages | Active |
-| agentic-cert | Agentic AI certification hub | https://zencloudau.github.io/agentic-cert/ | GitHub Pages static | GitHub Pages | Active |
+Verify through the public domain:
 
-## Velocity Architecture Deployment Contract
+```text
+GET  /
+GET  /research/
+GET  /publications/
+GET  /site-map.html
+GET  /_tokens.css
+GET  /docs.html?doc=VELOCITY_ENTERPRISE_ONE_PAGER.md
+GET  /app/portal.html or the selected portal route
+GET  /health
+GET  /status
+POST /artefacts/generate
+```
 
-The Velocity Architecture repository currently publishes from the repository root. Therefore:
+Also inspect:
 
-- repository paths for rendered HTML are public routes;
-- root-relative links assume the custom domain;
-- `velocityarchitectureframework.com` is canonical;
-- the `github.io/velocity-architecture/` address is retired or technical;
-- Markdown source paths are embedded in reader pages and cannot be moved independently;
-- a broad repository cleanup must preserve all public routes.
-
-See `docs/public-site-content-location-review.md` for the route and content-location assessment.
-
-## Deployment Health Checks
-
-For every repository:
-
-- README has the canonical live URL;
-- GitHub About section has the canonical website URL;
-- repository description exists;
-- origin platform is known;
-- edge/DNS provider is known;
-- production branch and deployment source are known;
-- main branch is source of truth unless the repository explicitly states otherwise;
-- no accidental `node_modules` are committed;
-- no secrets are committed;
-- no local-only agent settings are committed unless intentionally tracked;
-- generated build assets are either intentionally committed or excluded;
-- custom-domain routes are validated after deployment;
-- canonical tags, Open Graph URLs, sitemap, robots, and 404 behaviour are verified.
-
-## Known Follow-up Items
-
-1. Confirm Cloudflare Pages production branch for velocity-academy.
-2. Confirm whether velocity-academy deploys from root or build output.
-3. Decide whether vsf-match should continue committing generated assets back to the repository.
-4. Standardise README deployment blocks across all repositories.
-5. Add consistent footer routing across public sites.
-6. Confirm production URL and deployment target for pmi-portal.
-7. Confirm Cloudflare build settings for zencloud-advisory before replacing the primary ZenCloud site.
-8. Move Velocity Architecture from route-sensitive root publication to an explicit generated site artifact after route parity is established.
+- Cloudflare DNS records and proxy status;
+- Cloudflare Workers, Origin Rules, Redirect Rules, and path routing;
+- GitHub Pages custom-domain status;
+- Azure container FQDN and current public IP;
+- browser console and network errors;
+- cache invalidation;
+- mobile navigation and document-reader loading.
 
 ## Execution Rule
 
-Automation-first. Do not perform manual local edits unless explicitly requested. Deployment and workflow changes require a confidence threshold of at least 90%; otherwise pause and request verification.
+Do not relocate route-critical content or change DNS until the active topology is confirmed and a route inventory is captured.
