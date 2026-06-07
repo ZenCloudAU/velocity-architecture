@@ -1,66 +1,105 @@
-# Public Site Content Location Review
+# Public Site Content Location and Runtime Review
 
-Status: repository and route assessment  
-Scope: the live Velocity Architecture site published from this repository through GitHub Pages, using the custom domain `velocityarchitectureframework.com` and Cloudflare at the DNS/edge layer.
+Status: repository and deployment assessment  
+Scope: `velocityarchitectureframework.com`, the static framework estate, and the Velocity Agentic Architect runtime.
 
 ## Executive conclusion
 
-The documents are **not all in their correct long-term locations**, but many of them are currently in **route-critical locations**.
+The site is **not configured to work end-to-end as one coherent public service**.
 
-This repository is not only source control. With GitHub Pages publishing from `main` and the repository root, file placement directly controls public URLs and browser behaviour. A conventional root cleanup performed without a route migration would break the live site.
+The repository currently contains two incompatible deployment models:
 
-The correct approach is therefore:
+1. a root-published GitHub Pages static site, indicated by `CNAME`, `_config.yml`, and the large static HTML estate; and
+2. a Cloudflare-proxied Azure Container Instance, indicated by `PHASE5_RUNBOOK.md`, `.github/workflows/deploy.yml`, `Dockerfile`, `nginx.conf`, and the Express application.
 
-1. freeze existing public URLs;
-2. classify every file as public output, canonical content source, application source, operational documentation, or archive;
-3. create a route/content registry;
-4. move canonical source independently of public URLs;
-5. deploy only an explicit public-site artifact;
-6. preserve old routes with compatibility pages or redirects.
+Either model can serve part of the experience, but neither model alone can serve the complete experience as currently implemented.
 
-## Confirmed publishing model
+The current DNS target and Cloudflare rules must be inspected outside the repository before the live origin can be declared conclusively. Repository documentation is contradictory and must not be treated as proof of current DNS behaviour.
 
-Repository evidence establishes the following model:
+## Deployment conflict
 
-- `CNAME` declares `velocityarchitectureframework.com` as the GitHub Pages custom domain;
-- `_config.yml` describes a GitHub Pages static site and declares the same URL;
-- deployment documentation says the source branch is `main` and the site source is static;
-- root HTML uses domain-root paths such as `/_tokens.css`;
-- Cloudflare is the DNS/edge layer for the custom domain.
+### Static-site model
 
-The canonical public address should therefore be:
+Repository evidence for GitHub Pages includes:
 
-```text
-https://velocityarchitectureframework.com/
-```
+- `CNAME` containing `velocityarchitectureframework.com`;
+- `_config.yml` identifying GitHub Pages;
+- root `index.html` and section-level static routes;
+- public reader pages under `research/`, `frameworks/`, `guides/`, `diagnostics/`, `templates/`, `spec/`, and `publications/`.
 
-The `zencloudau.github.io/velocity-architecture/` address is a retired or technical GitHub Pages address, not the public canonical URL. Documentation should not present both as equivalent production destinations.
+If Cloudflare points the custom domain to GitHub Pages, the static framework and publication routes can work.
 
-## Why location matters
-
-Under the current root-published model:
+However, GitHub Pages cannot execute:
 
 ```text
-repository path                         public route
-index.html                              /
-research/index.html                     /research/
-research/example/index.html             /research/example/
-publications/index.html                 /publications/
-publications/book/chapter.html          /publications/book/chapter.html
-app/portal.html                         /app/portal.html
-site-map.html                           /site-map.html
-_tokens.css                             /_tokens.css
+POST /artefacts/generate
+GET /health
+GET /status
 ```
 
-Moving a rendered HTML file changes or removes its public URL.
+The public agent portal posts to `/artefacts/generate`, so generation will fail unless Cloudflare or another edge component explicitly proxies API routes to the Azure application.
 
-Moving a Markdown source file can also break a public page because several readers fetch source directly from `raw.githubusercontent.com` at runtime. Generated reader pages embed the exact Markdown path in their JavaScript and GitHub source links.
+### Azure application model
 
-## Current content classes
+Repository evidence for Azure Container Instances includes:
 
-### 1. Public route layer — generally in the correct functional locations
+- `.github/workflows/deploy.yml`, which builds and deploys the container on every push to `main`;
+- `PHASE5_RUNBOOK.md`, which instructs Cloudflare to proxy an A record to an Azure public IP;
+- `nginx.conf`, which proxies every request to Express;
+- `app/app.ts`, which implements the agent API.
 
-These files and directories currently define public URLs and should remain route-stable until a controlled site migration:
+If Cloudflare points the custom domain to Azure, the agent API can work.
+
+However, the container does not package or serve the complete static framework site:
+
+- `Dockerfile` copies only `app/portal.html` as a non-TypeScript asset;
+- Express serves that portal only at `/`;
+- there is no `express.static()` middleware;
+- Nginx proxies every path to Express;
+- Express returns JSON 404 responses for all other paths.
+
+Under that model, routes such as these will fail:
+
+```text
+/research/
+/publications/
+/frameworks/
+/guides/
+/site-map.html
+/_tokens.css
+/app/portal.html
+```
+
+The Azure application currently serves the portal at `/`, not `/app/portal.html`, despite public navigation linking to `/app/portal.html`.
+
+## No route-splitting implementation is recorded
+
+A complete combined service would require Cloudflare routing similar to:
+
+```text
+/artefacts/*  -> Azure application
+/health       -> Azure application
+/status       -> Azure application
+/*            -> GitHub Pages or static-site origin
+```
+
+No Cloudflare Worker, Pages Function, route manifest, reverse-proxy configuration, or infrastructure-as-code implementation for this split is present in the repository.
+
+A manual Cloudflare rule may exist outside the repository, but it is not evidenced or governed here.
+
+## Azure IP stability risk
+
+The Azure workflow deletes and recreates the container on deployment. The runbook instructs Cloudflare to use a fixed A record pointing to an Azure public IP.
+
+A recreated Azure Container Instance may receive a different public IP. The workflow assigns a DNS label but does not update the Cloudflare A record. This creates a deployment risk where every redeployment can leave Cloudflare pointing at a stale address.
+
+The stable Azure FQDN should be used through a CNAME where supported, or the deployment workflow should update Cloudflare DNS automatically.
+
+## Content-location findings
+
+### Route-critical public output
+
+These currently define public routes and must not move without compatibility handling:
 
 ```text
 index.html
@@ -78,26 +117,11 @@ examples/**/index.html
 spec/**/index.html
 templates/**/index.html
 viewpoints/index.html
-assets used by public HTML
 ```
 
-The public route taxonomy is broadly understandable:
+### Canonical Markdown source
 
-- `/research/`
-- `/frameworks/`
-- `/guides/`
-- `/diagnostics/`
-- `/examples/`
-- `/spec/`
-- `/templates/`
-- `/viewpoints/`
-- `/publications/`
-
-These route names should be preserved even if the repository source structure changes.
-
-### 2. Canonical Markdown source — mostly in reasonable domain locations
-
-The following source areas are correctly grouped by subject and can remain canonical source locations in the short term:
+These are generally reasonable source locations:
 
 ```text
 research/
@@ -111,369 +135,118 @@ series/
 signals-series/
 ```
 
-The patterns below are valid:
+The main structural problem is that canonical source, generated HTML, application code, operational documents, and local workspace files are all inside the same repository and potentially the same deployment source.
 
-```text
-book/*.md                -> publications/book/*.html
-series/**/*.md           -> publications/thought-series/**/*.html
-signals-series/*.md      -> publications/signal/*.html
-research/*.md            -> research/<slug>/index.html
-```
+### Root public documents
 
-The weakness is not the domain names. It is that source Markdown and generated HTML are mixed inside the same deployable repository tree, and some public pages load source from GitHub dynamically instead of containing a built copy.
+Several root Markdown documents are loaded by `docs.html?doc=<filename>` through a hardcoded allowlist and relative fetch requests.
 
-### 3. Root public documents — incorrectly organised, but currently route-critical
+They are in poor long-term locations but cannot be moved independently. A move must update:
 
-A set of root Markdown files is intentionally exposed through `docs.html?doc=<filename>`.
+- the viewer allowlist;
+- homepage links;
+- source fetch paths;
+- generated reader pages;
+- GitHub source links;
+- build manifests;
+- legacy public URLs.
 
-The viewer allowlist currently includes files such as:
+### Wrong deployment content
 
-```text
-VELOCITY_ENTERPRISE_ONE_PAGER.md
-VELOCITY_EXECUTIVE_ARCHITECTURE_FASTSTART.md
-ARCHITECTURE_DECISION_SPRINT.md
-SLT_DISCOVERY_WORKSHOP_AGENDA.md
-VELOCITY_DECISION_MATURITY_ASSESSMENT.md
-VELOCITY_AI_ARCHITECTURE_COORDINATION_LAYER.md
-VELOCITY_EA_VALUE_METRICS.md
-AI_AND_CLIENT_DATA_USAGE_POLICY.md
-VELOCITY_ENTERPRISE_ENGAGEMENT_PACK.md
-CONTENT_AND_PUBLISHING_PIPELINE.md
-FUTURE_FRAMEWORK_LENSES.md
-ECOSYSTEM_OPERATING_MODEL.md
-BRAND_SYSTEM.md
-PORTFOLIO_REPO_MAP.md
-```
-
-These files are in the wrong long-term repository locations, but moving them immediately would break:
-
-- `docs.html` allowlist keys;
-- relative `fetch(requestedDoc)` requests;
-- raw Markdown links;
-- homepage engagement-asset links;
-- external links using `docs.html?doc=...`;
-- generated publication pages that reference the root source path.
-
-They should move only after the public viewer is registry-driven and supports source paths independently of public route slugs.
-
-### 4. Generated publication output — correct route concept, weak generation boundary
-
-`publications/` is correctly serving as a reader-facing output namespace.
-
-However, it currently contains a mixture of:
-
-- handcrafted HTML;
-- generated reader wrappers;
-- full standalone article HTML;
-- publication indexes;
-- stylesheets;
-- aliases for content whose canonical source lives elsewhere.
-
-This is acceptable as a deployment output directory. It should not be treated as canonical source unless a page is intentionally handcrafted.
-
-The build should eventually recreate this directory from source and metadata. Generated output should not need manual source-of-truth decisions.
-
-### 5. Operational and continuity documents — wrong for the public deployment artifact
-
-The following classes do not belong in the deployed public-site artifact unless explicitly published:
-
-```text
-docs/continuity/
-docs/superpowers/
-docs/live-deployment-audit.md
-project completion and phase records
-migration instructions
-local working notes
-agent workspace output
-```
-
-They may remain in the public GitHub repository if they are intentionally transparent, but the website deployment should not copy them to the custom domain by default.
-
-### 6. Local and generated workspaces — wrong repository locations
-
-The following are not public-site content and should be removed, ignored, or moved to an external workspace archive:
+These should not be included in a public static-site artifact unless intentionally published:
 
 ```text
 .claude/settings.local.json
 .superpowers/brainstorm/
-docs/superpowers/*zencloud-advisory*
-```
-
-The ZenCloud Advisory redesign plans also have the wrong repository owner.
-
-### 7. Duplicate or legacy site surfaces — wrong locations
-
-The following create competing site implementations or stale public routes:
-
-```text
-website/_config.yml
-website/landing-page.html
-docs.html
+docs/continuity/
+docs/superpowers/
+project completion records
+migration instructions
+local working notes
 repository/
-_tokens.css versus design-system/vaf-tokens.css
+website/
+vsf-scorer/ source
+server-side TypeScript source
 ```
 
-Specific treatment:
+## Required target architecture
 
-- `website/` appears to be a legacy alternate site implementation and should be archived or removed after reference checks.
-- `repository/` is a repository-inside-the-repository duplicate and should not be part of the public information architecture.
-- `docs.html` is an active public viewer despite its generic name. It should be replaced by a stable route such as `/library/` or `/documents/`, while retaining `docs.html` as a compatibility redirect.
-- `_tokens.css` is route-critical because the homepage imports it from `/_tokens.css`. It cannot be removed until every consumer is migrated to a canonical public stylesheet route such as `/assets/css/tokens.css`.
+### Recommended public topology
 
-### 8. Application files — mixed public and server concerns
-
-`app/` contains both TypeScript server code and public HTML.
-
-The public site links to:
+Use separate origins with explicit routing:
 
 ```text
-/app/portal.html
+www/custom domain static routes -> generated static-site artifact
+api.velocityarchitectureframework.com -> Azure application
 ```
 
-GitHub Pages can serve that HTML, but it cannot run the Express API. The portal should only be advertised as operational if Cloudflare or another origin routes its API calls to the deployed backend.
-
-The preferred separation is:
+Preferred public routes:
 
 ```text
-app/                         application source only
-site/tools/agent/            static public client
+https://velocityarchitectureframework.com/                 static framework
+https://velocityarchitectureframework.com/research/        static publication
+https://api.velocityarchitectureframework.com/             agent API
 ```
 
-or a dedicated application domain with the framework site linking to it.
-
-The current `app/portal.html` route should remain only as a compatibility route if it has already been distributed publicly.
-
-### 9. Embedded standalone tool — wrong boundary
-
-`vsf-scorer/` is a standalone Vite application inside the framework repository.
-
-A source application should not be accidentally published merely because the main repository root is the Pages source. It should either:
-
-- move to its own repository;
-- remain as source but be excluded from the public site build; or
-- publish only its built static output to an intentional route.
-
-## Navigation and discoverability findings
-
-### The current site map is a navigation page, not a search-engine sitemap
-
-`site-map.html` is useful for people but:
-
-- it is not `sitemap.xml`;
-- it does not enumerate the full public publication estate;
-- it is not clearly linked from the main homepage navigation;
-- it labels the bare custom-domain URL as the agent even though that URL is also the framework homepage.
-
-Add:
+The static agent client can remain on the framework domain but should call an explicit API base URL:
 
 ```text
-sitemap.xml
-robots.txt
-404.html
+https://api.velocityarchitectureframework.com/artefacts/generate
 ```
 
-Generate `sitemap.xml` from the route registry rather than maintaining it manually.
+This is clearer and safer than depending on undocumented path-based Cloudflare proxy rules.
 
-### Canonical URL usage is inconsistent
-
-Current documentation alternates between:
+### Recommended repository layout
 
 ```text
-https://velocityarchitectureframework.com/
-https://zencloudau.github.io/velocity-architecture/
+content/                     canonical publication source
+app/                         server application source
+site-src/                    static-site templates and client source
+site/                        generated deployment artifact
+ops/                         deployment configuration
 ```
 
-The custom domain should be canonical everywhere. Public HTML should add:
+Deploy only `site/` to GitHub Pages. Deploy only the built application to Azure.
 
-```html
-<link rel="canonical" href="https://velocityarchitectureframework.com/<route>">
-```
+## Required verification
 
-Open Graph URLs should also use the custom domain for each page, not only the homepage.
-
-### Relative path styles are mixed
-
-The site uses both:
+A live acceptance test must verify all of the following through the public domain:
 
 ```text
-/index-like relative paths
-/domain-root absolute paths beginning with /
+GET  /
+GET  /research/
+GET  /publications/
+GET  /site-map.html
+GET  /_tokens.css
+GET  /docs.html?doc=VELOCITY_ENTERPRISE_ONE_PAGER.md
+GET  /app/portal.html or its replacement route
+GET  /health
+GET  /status
+POST /artefacts/generate with a controlled test request
 ```
 
-Root-relative paths are valid for the custom domain and reinforce that the `github.io/velocity-architecture/` project path is not an equivalent browsing URL.
+Also verify:
 
-Use the custom domain as the only canonical public URL and test all pages against that route model.
-
-## Recommended target architecture
-
-### Preferred target: explicit site artifact deployed by GitHub Actions
-
-```text
-content/
-├── research/
-├── frameworks/
-├── guides/
-├── diagnostics/
-├── templates/
-├── publications/
-├── engagements/
-└── policies/
-
-app/                         # TypeScript application source
-repository source domains/   # specifications, code, evidence and operations
-
-site/                        # generated deployment artifact
-├── index.html
-├── site-map.html
-├── sitemap.xml
-├── robots.txt
-├── 404.html
-├── assets/
-├── research/
-├── frameworks/
-├── guides/
-├── diagnostics/
-├── examples/
-├── spec/
-├── templates/
-├── viewpoints/
-└── publications/
-```
-
-A GitHub Actions Pages workflow should build `site/` and deploy only that directory.
-
-Benefits:
-
-- repository source location no longer dictates public URL;
-- operational documents are not accidentally deployed;
-- public routes remain stable while source files move;
-- one build can validate all links and source mappings;
-- `CNAME`, `sitemap.xml`, canonical tags, and public assets are generated consistently;
-- Cloudflare DNS and the public domain do not need to change.
-
-### Interim target: retain root deployment but introduce strict controls
-
-If an Actions-based site artifact is deferred:
-
-1. keep all current public HTML paths unchanged;
-2. create a content/route registry;
-3. stop adding new root Markdown files;
-4. update `_config.yml` exclusions for operational and source-only areas;
-5. migrate `docs.html` to registry-driven source paths;
-6. update all reader generators to use the registry;
-7. relocate root Markdown in small batches;
-8. retain compatibility HTML for old public routes.
-
-## Required content registry
-
-Create one machine-readable source, for example:
-
-```text
-site/content-registry.json
-```
-
-Recommended fields:
-
-```json
-{
-  "id": "velocity-enterprise-one-pager",
-  "title": "Velocity Enterprise One Pager",
-  "type": "engagement",
-  "status": "published",
-  "source": "content/engagements/offers/velocity-enterprise-one-pager.md",
-  "route": "/publications/velocity-enterprise-one-pager/",
-  "legacy_routes": [
-    "/docs.html?doc=VELOCITY_ENTERPRISE_ONE_PAGER.md"
-  ],
-  "listed": true,
-  "searchable": true
-}
-```
-
-This registry should drive:
-
-- publication indexes;
-- reader pages;
-- homepage cards;
-- navigation;
-- `sitemap.xml`;
-- source links;
-- route validation;
-- redirects and compatibility pages.
-
-## Route stability policy
-
-### Do not change without compatibility handling
-
-```text
-/
-/research/
-/research/<slug>/
-/frameworks/
-/frameworks/<slug>/
-/guides/
-/guides/<slug>/
-/diagnostics/
-/diagnostics/<slug>/
-/examples/
-/spec/
-/spec/<slug>/
-/templates/
-/templates/<slug>/
-/viewpoints/
-/publications/
-/publications/book/
-/publications/thought-series/
-/publications/signal/
-/publications/<slug>/
-/app/portal.html
-/docs.html?doc=<legacy-file>
-```
-
-A source document may move without changing its public route. A public route should change only with a redirect or compatibility page.
-
-## Revised cleanup sequence
-
-### Phase A — establish the public contract
-
-- declare `velocityarchitectureframework.com` canonical;
-- document GitHub Pages as origin and Cloudflare as DNS/edge;
-- inventory every public route;
-- create the content registry;
-- add route, link, and source-path validation;
-- add `sitemap.xml`, `robots.txt`, and `404.html`.
-
-### Phase B — remove material that is not route-dependent
-
-- remove local settings and workspace artefacts;
-- remove the duplicate root deployment workflow;
-- move wrong-repository ZenCloud Advisory plans;
-- archive clearly obsolete project records;
-- do not move root viewer documents yet.
-
-### Phase C — migrate root public documents
-
-For each document:
-
-1. move canonical Markdown to its domain directory;
-2. update the registry source path;
-3. update `docs.html` or replace it with the registry reader;
-4. update homepage links;
-5. update `scripts/build-docs.js` or its replacement;
-6. regenerate public reader output;
-7. preserve the old query-string route;
-8. validate through the custom domain.
-
-### Phase D — separate the deployment artifact
-
-- build `site/` from canonical source;
-- deploy `site/` through GitHub Actions Pages;
-- preserve the custom domain and Cloudflare configuration;
-- compare the complete route manifest before cutover;
-- remove root-publishing assumptions only after route parity is proven.
+- DNS A/CNAME targets;
+- Cloudflare proxied status;
+- Cloudflare redirect, origin, and Worker rules;
+- TLS mode;
+- GitHub Pages custom-domain status;
+- Azure container FQDN and current public IP;
+- browser console errors;
+- mobile navigation;
+- source-backed document loading;
+- 404 behaviour;
+- cache invalidation after deployment.
 
 ## Immediate decision
 
-Do **not** perform a broad root relocation yet.
+Do not relocate route-critical documents yet.
 
-The next implementation change should first create a public route/content inventory and update the cleanup plan so that every relocation is tested against the live custom-domain route contract.
+First resolve and document the live topology:
+
+1. determine whether Cloudflare currently sends the apex domain to GitHub Pages or Azure;
+2. inspect whether any path-based Cloudflare routing exists;
+3. establish one static-site origin and one API origin;
+4. run the full acceptance test;
+5. only then begin route-safe source relocation.
