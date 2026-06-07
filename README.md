@@ -2,7 +2,7 @@
 
 Velocity Architecture Framework is a decision-first architecture framework and tooling ecosystem for enterprise architecture, solution architecture, governance, research, and AI-assisted delivery.
 
-This repository is the source of truth for the framework, its practitioner material, public publications, reference artefacts, and the Velocity Agentic Architect application.
+This repository is the source of truth for the framework, its practitioner material, public publications, reference artefacts, and supporting tooling.
 
 - **Public site:** [velocityarchitectureframework.com](https://velocityarchitectureframework.com)
 - **Source repository:** [github.com/ZenCloudAU/velocity-architecture](https://github.com/ZenCloudAU/velocity-architecture)
@@ -17,17 +17,16 @@ This repository is the source of truth for the framework, its practitioner mater
 | Review the formal specification | [`spec/`](spec/) |
 | Browse viewpoints and correspondence rules | [`viewpoints/`](viewpoints/) and [`correspondence-rules/`](correspondence-rules/) |
 | Use practitioner guidance and templates | [`guides/`](guides/) and [`templates/`](templates/) |
-| Inspect the application | [`app/`](app/) |
 
-GitHub holds the canonical source. The repository currently contains both a GitHub Pages static-site configuration and an Azure Container deployment behind Cloudflare. The live origin and route split must be verified before either deployment model is treated as authoritative.
+GitHub holds the canonical source. GitHub Pages publishes the static site, while Cloudflare provides the custom-domain edge layer. Separate Azure application experiments or instances are not part of the article and publication-site delivery model.
 
 ## Repository Role
 
-The repository has grown into three coordinated layers:
+The repository has grown into three coordinated areas:
 
 1. **Framework authority** — principles, specifications, viewpoints, correspondence rules, diagnostics, guides, templates, examples, and reference material.
-2. **Publication estate** — research papers, article series, public operating models, and generated reader pages.
-3. **Tooling** — a TypeScript/Node.js application that loads framework knowledge, routes structured requests through specialised generators, validates outputs, and prepares repository-aligned artefacts.
+2. **Publication estate** — research papers, article series, public operating models, and rendered reader pages.
+3. **Supporting tooling** — scripts and application experiments that support framework development but are not necessarily part of the public publication runtime.
 
 The objective is not documentation volume. The objective is to make architecture intent, decisions, guardrails, evidence, and delivery action explicit and traceable.
 
@@ -49,44 +48,24 @@ The objective is not documentation volume. The objective is to make architecture
 | `publications/` | Reader-facing publication pages and published material |
 | `ecosystem/` | Cross-repository links and change protocols |
 
-## Application and Generated Artefacts
-
-The Velocity Agentic Architect is implemented in `app/`. It currently provides:
-
-- an Express API and portal entry point;
-- a framework knowledge loader;
-- an orchestration layer;
-- six generator families covering governance, strategy, design, velocity, rhythm, and practitioner outputs;
-- routing for strategic, design, governance, assurance, delivery, and value artefacts;
-- validation and GitHub action support;
-- structured output metadata and repository paths.
-
-Primary endpoints:
-
-| Method | Route | Purpose |
-|---|---|---|
-| `GET` | `/` | Portal UI on the application origin |
-| `GET` | `/health` | Runtime health |
-| `GET` | `/status` | Runtime and capability status |
-| `POST` | `/artefacts/generate` | Generate requested architecture artefacts |
-
-Generated and reference outputs are held under `artefacts/`. Templates and worked examples remain separate so generated output is not treated as canonical framework doctrine.
-
 ## Public Site and Publishing
 
-The repository contains a static publication estate intended for `velocityarchitectureframework.com`. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
+The static publication estate is served at `velocityarchitectureframework.com`. Source Markdown is rendered into reader pages through repository scripts and section-specific HTML.
 
 Relevant areas include:
 
 - `scripts/` — publishing and repository utility scripts;
 - `design-system/` and `assets/` — shared visual and brand resources;
-- root and section-level HTML — static publication surfaces;
-- `.github/workflows/` — Azure application deployment and repository checks;
+- root and section-level HTML — GitHub Pages publication surfaces;
 - `docs/` — deployment, continuity, and operational documentation.
 
 Public source and generated publication output should remain distinguishable. Generated pages should not become a second source of truth for framework content. Existing public routes must remain stable when source documents are relocated.
 
-The static publication origin and the application API origin should be explicitly separated or governed by documented Cloudflare routing.
+## Supporting Application Code
+
+The repository also contains TypeScript and Node.js application code under `app/`, plus related deployment artefacts. This code is separate from the static article and publication site unless a future release explicitly integrates it.
+
+Generated and reference outputs are held under `artefacts/`. Templates and worked examples remain separate so generated output is not treated as canonical framework doctrine.
 
 ## Local Development
 
@@ -94,7 +73,7 @@ Requirements:
 
 - Node.js 20 or later;
 - npm;
-- an Anthropic API key for generation;
+- an Anthropic API key where generation features are used;
 - a GitHub token only where repository write operations are enabled.
 
 ```bash
@@ -103,7 +82,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Build and run compiled output:
+Build compiled application output:
 
 ```bash
 npm run build
@@ -118,16 +97,13 @@ npm run lint
 npm run format
 ```
 
-The application uses port `3000` by default. Environment variables and safe placeholders are documented in `.env.example`.
-
 ## Repository Controls
 
 - Do not commit credentials, tokens, private environment files, or client data.
 - Treat generated artefacts as outputs, not automatically accepted architecture decisions.
 - Preserve human review and professional accountability for AI-assisted outputs.
-- Keep framework source, generated publication output, application code, and operational evidence clearly separated.
+- Keep framework source, rendered publication output, application code, and operational evidence clearly separated.
 - Preserve public custom-domain routes when moving canonical source files.
-- Document the static-site origin, API origin, and Cloudflare routing explicitly.
 - Update cross-repository links through the ecosystem registry and change protocol.
 - Use `main` as the source of truth unless a release process explicitly states otherwise.
 
@@ -137,7 +113,7 @@ See [`AI_AND_CLIENT_DATA_USAGE_POLICY.md`](AI_AND_CLIENT_DATA_USAGE_POLICY.md), 
 
 Active and evolving.
 
-The repository now operates as a combined framework authority, publication estate, and architecture tooling codebase. Current maintenance priorities are resolving the public deployment topology, structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, preservation of public routes, and alignment of version and licensing metadata.
+The public article and publication site is operational. Current maintenance priorities are structural consolidation, consistent naming, removal of duplicate operational files, clearer separation of source and generated assets, preservation of public routes, and alignment of version and licensing metadata.
 
 ## Contributing
 
