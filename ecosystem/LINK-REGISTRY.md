@@ -1,79 +1,85 @@
 # Ecosystem Link Registry
 
-Canonical URLs for all ZenCloud ecosystem repos. Source of truth for all cross-site links.
+Canonical URLs for the ZenCloud ecosystem. This is the source of truth for cross-site links.
 
----
+## Hosting terminology
+
+- **Origin** is the platform that publishes or runs the site.
+- **Edge** is the DNS, TLS, redirect, proxy, caching, or security layer in front of the origin.
+- **Canonical URL** is the only URL that public navigation, metadata, and publishing guidance should promote.
 
 ## Canonical URLs
 
-| Repo | Canonical URL | Hosting | Status |
-|------|--------------|---------|--------|
-| velocity-architecture | `https://velocityarchitectureframework.com/` | Azure Container / Cloudflare | Live — custom domain |
-| velocity-academy | `https://velocityarchitecture.com.au/` | GitHub Pages / Cloudflare | Live — custom domain |
-| zencloud-advisory | `https://www.zencloud.com.au/` | Cloudflare Pages | Pending DNS cutover |
-| studiosix | `https://studiosix.com.au/` | GitHub Pages / Cloudflare | Live — custom domain |
-| ea-artefact-generator | `https://ea.velocityarchitecture.com.au/` | GitHub Pages / Cloudflare | Live — custom domain |
-| vaf-sa | `https://zencloudau.github.io/vaf-sa/` | GitHub Pages | Live — GitHub Pages |
-| vsf-match | `https://zencloudau.github.io/vsf-match/` | GitHub Pages | Live — GitHub Pages |
-| vaf-python-zero-to-hero | `https://zencloudau.github.io/vaf-python-zero-to-hero/` | GitHub Pages | Live — GitHub Pages |
-| vaf-typescript-zero-to-hero | `https://zencloudau.github.io/vaf-typescript-zero-to-hero/` | GitHub Pages | Live — GitHub Pages |
-| AzureSACertification | `https://zencloudau.github.io/AzureSACertification/` | GitHub Pages | Live — GitHub Pages |
-| SAPEACertification | `https://zencloudau.github.io/SAPEACertification/` | GitHub Pages | Live — GitHub Pages |
-| CISSPCertification | `https://zencloudau.github.io/CISSPCertification/` | GitHub Pages | Live — GitHub Pages |
-| learn-with-claude | `https://zencloudau.github.io/learn-with-claude/` | GitHub Pages | Live — GitHub Pages |
-| trading-dashboard | `https://zencloudau.github.io/trading-dashboard/` | GitHub Pages | Live — GitHub Pages |
-| pmi-portal | `https://zencloudau.github.io/pmi-portal/` | GitHub Pages | Live — GitHub Pages |
+| Repo | Canonical URL | Origin | Edge | Status |
+|------|--------------|--------|------|--------|
+| velocity-architecture | `https://velocityarchitectureframework.com/` | GitHub Pages from `main` repository root | Cloudflare | Live — custom domain; route-sensitive root deployment |
+| velocity-academy | `https://velocityarchitecture.com.au/` | GitHub Pages or Cloudflare Pages — verify project configuration | Cloudflare | Live — custom domain |
+| zencloud-advisory | `https://www.zencloud.com.au/` | Cloudflare Pages | Cloudflare | Active |
+| studiosix | `https://studiosix.com.au/` | GitHub Pages | Cloudflare | Live — custom domain |
+| ea-artefact-generator | `https://ea.velocityarchitecture.com.au/` | GitHub Pages | Cloudflare | Live — custom domain |
+| vaf-sa | `https://zencloudau.github.io/vaf-sa/` | GitHub Pages | GitHub Pages | Live |
+| vsf-match | `https://zencloudau.github.io/vsf-match/` | GitHub Pages | GitHub Pages | Live |
+| vaf-python-zero-to-hero | `https://zencloudau.github.io/vaf-python-zero-to-hero/` | GitHub Pages | GitHub Pages | Live |
+| vaf-typescript-zero-to-hero | `https://zencloudau.github.io/vaf-typescript-zero-to-hero/` | GitHub Pages | GitHub Pages | Live |
+| AzureSACertification | `https://zencloudau.github.io/AzureSACertification/` | GitHub Pages | GitHub Pages | Live |
+| SAPEACertification | `https://zencloudau.github.io/SAPEACertification/` | GitHub Pages | GitHub Pages | Live |
+| CISSPCertification | `https://zencloudau.github.io/CISSPCertification/` | GitHub Pages | GitHub Pages | Live |
+| learn-with-claude | `https://zencloudau.github.io/learn-with-claude/` | GitHub Pages | GitHub Pages | Live |
+| trading-dashboard | `https://zencloudau.github.io/trading-dashboard/` | GitHub Pages | GitHub Pages | Live |
+| pmi-portal | `https://zencloudau.github.io/pmi-portal/` | GitHub Pages | GitHub Pages | Verify canonical production status |
 
----
+## Velocity Agent Entry Point
 
-## VAF Agent Entry Point
+The currently published static entry route is:
 
-The VAF Agentic Architect is accessed at:
-
-```
+```text
 https://velocityarchitectureframework.com/app/portal.html
 ```
 
-All agent launch links (`Open agent ↗`, `VAF Agent ↗`, `Agentic Architect ↗`) must point to this URL — not the bare domain.
+All agent launch links must point to this route rather than the bare domain.
 
-Site navigation back-links (`← VAF`, `VAF Framework ↗`, `Velocity Architecture Framework`) may link to the bare domain.
+This route is served as static HTML by the public site. It must only be described as operational when its API requests are confirmed to reach a live backend through the deployed routing model.
 
----
+Site navigation back-links may link to the bare canonical domain.
 
-## Retired / Redirected URLs
+## Retired or redirected URLs
 
-These URLs are no longer canonical. Update all live links to the current canonical.
+These URLs are not canonical. Update all live links to the current canonical destination.
 
-| Old URL | Redirects To |
-|---------|-------------|
+| Old URL | Canonical destination |
+|---------|-----------------------|
 | `https://zencloudau.github.io/velocity-architecture/` | `https://velocityarchitectureframework.com/` |
 | `https://zencloudau.github.io/velocity-academy/` | `https://velocityarchitecture.com.au/` |
 | `https://velocity-academy.pages.dev/` | `https://velocityarchitecture.com.au/` |
 
----
+## Public metadata standard
 
-## og: Meta Status
+Every index and article page intended for public discovery should carry:
 
-All public HTML entry points carry `og:url`, `og:title`, `og:description`.
+```text
+<title>
+meta description
+link rel=canonical
+og:url
+og:title
+og:description
+```
 
-| Repo | Entry Point | og:url | og:title | og:description |
-|------|-------------|--------|----------|----------------|
-| velocity-architecture | index.html | ✓ | ✓ | ✓ |
-| velocity-academy | index.html | ✓ | ✓ | ✓ |
-| zencloud-advisory | index.html | ✓ | ✓ | ✓ |
-| studiosix | index.html | ✓ | ✓ | ✓ |
-| ea-artefact-generator | index.html | ✓ | ✓ | ✓ |
-| vaf-sa | index.html, toolkit.html, lexicon.html | ✓ | ✓ | ✓ |
-| vsf-match | index.html, landing.html | ✓ | ✓ | ✓ |
-| vaf-python-zero-to-hero | index.html, docs/index.html | ✓ | ✓ | ✓ |
-| vaf-typescript-zero-to-hero | docs/index.html | ✓ | ✓ | ✓ |
-| AzureSACertification | index.html | ✓ | ✓ | ✓ |
-| SAPEACertification | index.html | ✓ | ✓ | ✓ |
-| learn-with-claude | index.html | ✓ | ✓ | ✓ |
-| trading-dashboard | index.html | ✓ | ✓ | ✓ |
-| pmi-portal | index.html | ✓ | ✓ | ✓ |
-| CISSPCertification | Jekyll — managed in _config.yml | — | — | — |
+The canonical and Open Graph URLs must use the canonical domain recorded above.
 
----
+The current repository confirms these fields for selected entry points, but the full publication estate still requires a generated metadata audit.
 
-*Last audited: 2026-05-29. See CHANGE-PROTOCOL.md for update process.*
+## Change control
+
+A URL change is not complete until the following are updated together:
+
+- this registry;
+- repository README and deployment documentation;
+- navigation and footer links;
+- canonical and Open Graph metadata;
+- sitemap and robots directives;
+- source-to-route registry;
+- compatibility redirects or pages;
+- Cloudflare redirect rules where applicable.
+
+*Reviewed: 2026-06-08. See `CHANGE-PROTOCOL.md` and `docs/public-site-content-location-review.md`.*
