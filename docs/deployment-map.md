@@ -6,57 +6,30 @@ This document records the deployment model for the ZenCloudAU / Velocity Archite
 
 1. Source files and generated build files should be separate.
 2. Canonical URL, origin, DNS/edge provider, build command, and output directory must be recorded independently.
-3. Cloudflare may provide DNS, TLS, redirects, caching, security, or path routing without being the application origin.
-4. A service must not be declared operational until its public routes and APIs pass acceptance tests.
+3. Cloudflare may provide DNS, TLS, redirects, caching, and security without being the content origin.
+4. Public route stability is part of the deployment contract.
 
-## Velocity Architecture — unresolved topology
+## Velocity Architecture Public Site
 
-Canonical URL:
+| Field | Value |
+|---|---|
+| Role | Framework authority and publication estate |
+| Canonical URL | https://velocityarchitectureframework.com/ |
+| Origin | GitHub Pages |
+| Source | `main`, repository root |
+| Edge and DNS | Cloudflare |
+| Content model | Static HTML with source-backed Markdown readers |
+| Status | Operational |
 
-```text
-https://velocityarchitectureframework.com/
-```
+The public site includes framework pages, research, articles, publications, guides, diagnostics, templates, specifications, examples, and viewpoints.
 
-Repository evidence currently describes two different origins:
+Repository paths for rendered HTML currently map directly to public routes. Source Markdown paths are also embedded in several reader pages. A cleanup must therefore preserve routes and update source mappings atomically.
 
-| Layer | Repository evidence | Capability |
-|---|---|---|
-| Static publication estate | `CNAME`, `_config.yml`, root and section-level HTML | Framework, research, guides, publications and public readers |
-| Agent application | `.github/workflows/deploy.yml`, `Dockerfile`, `nginx.conf`, `app/app.ts`, `PHASE5_RUNBOOK.md` | Portal, health/status endpoints and artefact generation API |
+## Separate Azure Application Instance
 
-The live Cloudflare DNS target and any path-routing rules must be inspected before the active topology can be declared.
+The repository contains Azure container deployment and TypeScript application artefacts. That instance is separate from the article and publication site and is out of scope for static-site availability and content-location assessment.
 
-### Static-origin limitation
-
-GitHub Pages can serve the publication estate but cannot execute:
-
-```text
-GET /health
-GET /status
-POST /artefacts/generate
-```
-
-### Azure-origin limitation
-
-The Azure container packages the compiled application and `app/portal.html`, but not the full static website. Express serves the portal at `/` and returns JSON 404 responses for unimplemented routes. It therefore cannot serve the full publication estate as currently built.
-
-### Required production model
-
-Preferred:
-
-```text
-velocityarchitectureframework.com      -> static site origin
-api.velocityarchitectureframework.com  -> Azure application origin
-```
-
-Alternative:
-
-```text
-/artefacts/*, /health, /status -> Azure
-all other routes               -> static origin
-```
-
-The alternative requires documented Cloudflare routing or a reverse proxy that is version-controlled and tested.
+It should be treated as a distinct application concern even though the code currently shares this repository.
 
 ## Other Ecosystem Sites
 
@@ -75,33 +48,29 @@ The alternative requires documented Cloudflare routing or a reverse proxy that i
 | AzureSACertification | Azure SA certification | https://zencloudau.github.io/AzureSACertification/ | GitHub Pages | GitHub Pages | Active |
 | CISSPCertification | CISSP certification | https://zencloudau.github.io/CISSPCertification/ | GitHub Pages | GitHub Pages | Active |
 
-## Velocity Acceptance Test
+## Public-Site Acceptance Checks
 
-Verify through the public domain:
+Verify after structural changes:
 
 ```text
-GET  /
-GET  /research/
-GET  /publications/
-GET  /site-map.html
-GET  /_tokens.css
-GET  /docs.html?doc=VELOCITY_ENTERPRISE_ONE_PAGER.md
-GET  /app/portal.html or the selected portal route
-GET  /health
-GET  /status
-POST /artefacts/generate
+GET /
+GET /research/
+GET /publications/
+GET /site-map.html
+GET /_tokens.css
+GET /docs.html?doc=VELOCITY_ENTERPRISE_ONE_PAGER.md
 ```
 
-Also inspect:
+Also verify:
 
-- Cloudflare DNS records and proxy status;
-- Cloudflare Workers, Origin Rules, Redirect Rules, and path routing;
-- GitHub Pages custom-domain status;
-- Azure container FQDN and current public IP;
+- Cloudflare custom-domain routing;
+- GitHub Pages deployment freshness;
 - browser console and network errors;
-- cache invalidation;
-- mobile navigation and document-reader loading.
+- source-backed document loading;
+- mobile navigation;
+- 404 behaviour;
+- cache invalidation.
 
 ## Execution Rule
 
-Do not relocate route-critical content or change DNS until the active topology is confirmed and a route inventory is captured.
+Do not relocate route-critical content until the public route inventory and source mappings are captured.
