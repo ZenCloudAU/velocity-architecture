@@ -69,5 +69,16 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  var h=location.hash.slice(1);
+  if(!h)return;
+  var map={
+    'zencloud-trans-pacific-addendum-may-2026.md':'zencloud-trans-pacific-addendum-may-2026/',
+    'zencloud-it-governance-working-paper-may-2026.md':'zencloud-it-governance-working-paper-may-2026/'
+  };
+  if(map[h])window.location.replace(map[h]);
+})();
+</script>
 </body>
 </html>
