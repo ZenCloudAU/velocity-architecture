@@ -15,19 +15,21 @@
 </style>
 </head>
 <body>
+<nav class="ecosystem-strip" aria-label="Ecosystem navigation" style="background:#0f172a;color:#F8FAFC;display:flex;align-items:center;gap:2rem;padding:0.5rem 2rem;font-size:0.75rem;font-family:'DM Sans',sans-serif;border-bottom:1px solid #1e293b;flex-wrap:wrap;"><span style="color:#64748B;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-right:auto;">ZenCloud Ecosystem</span><a href="https://www.zencloud.com.au" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">ZenCloud™</a><a href="https://studiosix.com.au" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">StudioSix™</a><a href="https://velocityarchitectureframework.com" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">Velocity™</a></nav>
+
 <nav>
-  <a class="brand" href="../../index.html">Velocity Architecture Framework™</a>
+  <a class="brand" href="../../index.html">Velocity™</a>
   <div class="nav-links">
     <a href="../../index.html">Framework</a>
     <a href="../index.html">Research</a>
     <a href="https://www.zencloud.com.au/">ZenCloud</a>
     <a href="https://studiosix.com.au/">StudioSix</a>
     <a href="https://velocityarchitecture.com.au/">Academy</a>
-    <a href="https://github.com/ZenCloudAU/velocity-architecture" target="_blank" rel="noopener">GitHub</a>
+    
   </div>
 </nav>
 <main>
-  <div class="breadcrumb"><a href="../../index.html">Velocity Architecture Framework</a> › <a href="../index.html">Research</a> › Working Paper</div>
+  <div class="breadcrumb"><a href="../../index.html">Velocity™</a> › <a href="../index.html">Research</a> › Working Paper</div>
   <section class="hero">
     <span class="eyebrow">Working Paper · May 2026</span>
     <h1>A Comparative Analysis of IT Governance Frameworks</h1>
@@ -44,7 +46,7 @@
     <a href="https://velocityarchitecture.com.au/">Velocity Academy</a>
   </div>
   <article class="article" id="article"><p class="loading">Loading working paper…</p></article>
-  <p class="source">Source of truth: <a href="https://github.com/ZenCloudAU/velocity-architecture/blob/main/research/zencloud-it-governance-working-paper-may-2026.md" target="_blank" rel="noopener">GitHub Markdown</a></p>
+  
   <footer>
     <strong>ZenCloud advises. StudioSix produces. Velocity decides.</strong>
     <div class="footer-links">
@@ -53,7 +55,7 @@
       <a href="https://www.zencloud.com.au/">ZenCloud Advisory</a>
       <a href="https://studiosix.com.au/">StudioSix</a>
       <a href="https://velocityarchitecture.com.au/">Velocity Academy</a>
-      <a href="https://github.com/ZenCloudAU/velocity-architecture" target="_blank" rel="noopener">GitHub</a>
+      
     </div>
   </footer>
 </main>
@@ -67,7 +69,7 @@ async function load(){
     const md=await r.text();
     el.innerHTML='<div class="md">'+marked.parse(md)+'</div>';
   }catch(e){
-    el.innerHTML='<p class="error">Could not load the working paper. <a href="https://github.com/ZenCloudAU/velocity-architecture/blob/main/research/zencloud-it-governance-working-paper-may-2026.md" target="_blank" rel="noopener">View source on GitHub</a>.</p>';
+    el.innerHTML='<p class="error">Could not load the working paper. .</p>';
   }
 }
 load();
