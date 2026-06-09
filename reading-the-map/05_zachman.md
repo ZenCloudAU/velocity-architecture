@@ -1,6 +1,6 @@
-Part 2 · The Frameworks Explained
-Chapter 5
-Zachman — The Classification System
+# Chapter 5: Zachman — The Classification System
+
+*Part 2 · The Frameworks Explained*
 
 John Zachman did not invent enterprise architecture. He gave it a way to think about itself.
 
@@ -14,23 +14,33 @@ Imagine the situation at Meridian Health Partnership today. The clinical directo
 
 That is the problem Zachman was looking at in 1987. And the solution he proposed was not a new methodology. It was not a process. It was a classification system. A way of organising the different descriptions of an enterprise so that every type of description had a home and nothing important was confused with something else.
 
-
-The grid
+## The grid
 
 The Zachman Framework is a six-by-six matrix. Six rows. Six columns. Thirty-six cells. Each cell represents a distinct type of architecture description.
 
-The rows represent different perspectives. Different audiences who need different things from the same organisation.
+The rows represent different perspectives. Different audiences who need different things from the same organisation. From the most abstract to the most concrete, they are:
 
+- **Executive (Scope)** — the boardroom view: what the enterprise is fundamentally about.
+- **Business Management** — the business model: how the organisation operates.
+- **Architect** — the system logic: a coherent, technology-neutral model.
+- **Engineer** — the technology model: how it will actually be built.
+- **Technician** — the detailed specifications: the as-built configuration.
+- **Enterprise** — the functioning organisation itself, in operation.
 
-The columns represent the six interrogatives. Six questions that any complete description of an enterprise must be able to answer.
+The columns represent the six interrogatives. Six questions that any complete description of an enterprise must be able to answer:
 
+- **What** (data) — the things the enterprise cares about.
+- **How** (function) — the processes it performs.
+- **Where** (network) — the locations and how they connect.
+- **Who** (people) — the roles and responsibilities.
+- **When** (timing) — the events and cycles.
+- **Why** (motivation) — the goals and rules that drive it.
 
 Every cell in the grid is the intersection of one row and one column. The cell at Row 3, Column 1 is the architect's view of what data exists. The cell at Row 2, Column 6 is the business manager's view of why the organisation exists. The cell at Row 5, Column 2 is the technician's view of how something actually runs.
 
 None of these cells is more important than the others. None of them is the whole picture. All thirty-six together add up to a complete description of an enterprise. That is the Zachman Framework. Not a process. Not a methodology. A classification system that tells you where every type of description belongs.
 
-
-The aeroplane and the building
+## The aeroplane and the building
 
 Zachman used an analogy to explain the framework that still works thirty-nine years later.
 
@@ -40,8 +50,7 @@ Each of these is a complete and accurate description of the same aeroplane. None
 
 At Meridian, the patient record system is exactly like that aeroplane. The clinical director's description of it as a care delivery tool is accurate and complete for her purposes. The infrastructure engineer's description of it as a virtual machine on VMware is accurate and complete for his purposes. The data governance lead's description of it as a repository of personally identifiable health information is accurate and complete for her purposes. All three are right. All three belong in different cells of the Zachman grid. The problem is not that any description is wrong. The problem is that Meridian has never organised them so people can find the right one when they need it.
 
-
-Where you will encounter Zachman
+## Where you will encounter Zachman
 
 Zachman is less commonly used as an active working tool than TOGAF or ArchiMate. Most organisations that work with Zachman use it as a reference model rather than a daily practice.
 
@@ -55,7 +64,7 @@ The third is in organisations doing serious architecture documentation. When an 
 
 Meridian's new enterprise architect uses the Zachman grid in her first month. Not to build a complete thirty-six cell model — that would take years. But to check completeness. She maps what documentation already exists at Meridian against the grid. Seven cells have reasonable content. Twenty-nine are empty. That tells her exactly where the gaps are before she starts planning. The grid did not tell her what to build. It told her what was missing.
 
-What Zachman does well and where its limits are
+## What Zachman does well and where its limits are
 
 Zachman does one thing exceptionally well. It provides a complete and logical classification of every type of architecture description an enterprise might need. Nothing is missing from the grid. Nothing is in the wrong place. As a completeness check and a shared vocabulary it is rigorous and elegant.
 
