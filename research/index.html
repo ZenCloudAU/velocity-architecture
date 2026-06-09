@@ -133,8 +133,6 @@ function init(){
     const btn=document.querySelector('.file-btn[data-p$="/'+h+'"]')||document.querySelector('.file-btn[data-p="'+h+'"]');
     if(btn){loadDoc(btn.dataset.p);return;}
   }
-  const target=document.querySelector('.file-btn[data-p="research/zencloud-it-governance-working-paper-may-2026.md"]')||document.querySelector('.file-btn[data-p]');
-  if(target)loadDoc(target.dataset.p);
 }
 window.addEventListener('popstate',init);
 document.addEventListener('DOMContentLoaded',init);

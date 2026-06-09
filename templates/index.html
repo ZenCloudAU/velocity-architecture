@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Templates — Velocity™</title>
+<meta name="description" content="Velocity™ practitioner templates — architecture decision records, guardrail canvases, trade-off matrices, pulse briefings, and the complete EA artefact template set.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F5F9;--surface:#FFFFFF;--surface-2:#F8FAFC;--border:#E2E8F0;--border-2:#CBD5E1;--text:#0F172A;--text-2:#475569;--text-3:#94A3B8;--orange:#E8630A;--orange-hover:#CC5508;--orange-subtle:#FFF7ED;--orange-border:#FED7AA;--navy:#1E3A5F;--navy-2:#162D4A;--r:10px;--shadow:0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);--shadow-md:0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.6;overflow-x:hidden}a{color:var(--orange);text-decoration:none}a:hover{text-decoration:underline}nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}.nav-brand{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}.nav-brand sup{font-size:.5rem;color:var(--orange);vertical-align:super}.nav-brand-badge{font-family:'DM Mono',monospace;font-size:.55rem;font-weight:500;letter-spacing:.08em;background:var(--orange-subtle);color:var(--orange);border:1px solid var(--orange-border);padding:2px 7px;border-radius:4px}.nav-links{display:flex;gap:1.75rem;list-style:none;align-items:center}.nav-links a{font-family:'DM Sans',sans-serif;font-size:.875rem;font-weight:400;color:var(--text-2);text-decoration:none;transition:color .2s}.nav-links a:hover{color:var(--text)}.nav-cta{display:inline-block;padding:.45rem 1rem;background:var(--orange);color:#fff;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;text-decoration:none;border-radius:6px;transition:background .2s}.nav-cta:hover{background:var(--orange-hover)}@media(max-width:768px){.nav-links{display:none}.nav-cta{display:none}}
+.page-wrap{max-width:1100px;margin:0 auto;padding:80px 2rem 4rem}.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.5rem;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;color:var(--text-3)}.breadcrumb a{color:var(--text-3);text-decoration:none;transition:color .2s}.breadcrumb a:hover{color:var(--orange)}.breadcrumb span{color:var(--border-2)}.page-header{margin-bottom:2rem}.page-eyebrow{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:.5rem}.page-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:var(--text);margin-bottom:.5rem}.page-desc{font-size:.95rem;color:var(--text-2);line-height:1.65;max-width:720px}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:2rem}.template-card{display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}.template-card:hover{border-color:var(--orange);box-shadow:var(--shadow-md);text-decoration:none}.card-tag{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:.65rem}.card-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.4rem}.card-desc{font-size:.86rem;color:var(--text-2);line-height:1.65}.card-cta{display:inline-block;margin-top:1rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--orange);letter-spacing:.04em}
+footer{background:var(--navy-2);color:rgba(226,232,240,.7);padding:2.5rem 2rem}.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem}.footer-brand{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#E2E8F0}.footer-brand sup{font-size:.5rem;color:var(--orange);vertical-align:super}.footer-links{display:flex;gap:1.5rem;flex-wrap:wrap}.footer-links a{font-size:.78rem;color:rgba(226,232,240,.55);text-decoration:none;transition:color .2s}.footer-links a:hover{color:#E2E8F0}.footer-copy{font-size:.72rem;color:rgba(226,232,240,.3)}
+</style>
+</head>
+<body>
+
+<!-- SHARED-NAV-START -->
+<nav class="ecosystem-strip" aria-label="Ecosystem navigation" style="background:#0f172a;color:#F8FAFC;display:flex;align-items:center;gap:2rem;padding:0.5rem 2rem;font-size:0.75rem;font-family:'DM Sans',sans-serif;border-bottom:1px solid #1e293b;flex-wrap:wrap;"><span style="color:#64748B;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-right:auto;">ZenCloud Ecosystem</span><a href="https://www.zencloud.com.au" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">ZenCloud™</a><a href="https://studiosix.com.au" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">StudioSix™</a><a href="https://velocityarchitectureframework.com" style="color:#F8FAFC;text-decoration:none;opacity:0.8;">Velocity™</a></nav>
+<nav>
+  <a href="/" class="nav-brand">Velocity<sup>™</sup><span class="nav-brand-badge">Open Source</span></a>
+  <ul class="nav-links">
+    <li><a href="/frameworks/">Framework</a></li>
+    <li><a href="/research/">Research</a></li>
+    <li><a href="/publications/">Publications</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/diagnostics/">Diagnostics</a></li>
+    <li><a href="/examples/">Examples</a></li>
+  </ul>
+  <a href="https://velocityarchitectureframework.com/app/portal.html" class="nav-cta" target="_blank" rel="noopener">Open agent ↗</a>
+</nav>
+<!-- SHARED-NAV-END -->
+
+<div class="page-wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Velocity™</a><span>›</span><span>Templates</span></nav>
+  <div class="page-header">
+    <span class="page-eyebrow">Repository · /templates/</span>
+    <h1 class="page-title">Practitioner Templates</h1>
+    <p class="page-desc">Ready-to-use Velocity™ artefact templates — decision records, guardrail canvases, trade-off matrices, pulse briefings, and the complete 18-artefact EA set. Copy, adapt, and use in your practice.</p>
+  </div>
+
+  <div class="template-grid">
+
+    <a class="template-card" href="vaf-ea-artefact-templates/">
+      <p class="card-tag">Complete Set · 18 Artefacts</p>
+      <p class="card-title">Velocity™ EA Artefact Templates</p>
+      <p class="card-desc">The full set of Velocity™ enterprise architecture artefact templates — all 18 artefacts across direction-setting, diagnostic, and communication layers.</p>
+      <span class="card-cta">Open templates →</span>
+    </a>
+
+    <a class="template-card" href="adr/">
+      <p class="card-tag">Decision · Record</p>
+      <p class="card-title">Architecture Decision Record</p>
+      <p class="card-desc">Structured format for capturing and communicating architecture decisions — context, options considered, decision made, and consequences.</p>
+      <span class="card-cta">Open template →</span>
+    </a>
+
+    <a class="template-card" href="guardrail-canvas/">
+      <p class="card-tag">Direction-Setting · Canvas</p>
+      <p class="card-title">Guardrail Canvas</p>
+      <p class="card-desc">Direction-setting artefact for establishing architecture guardrails — what is in bounds, what is out, and why. Keeps teams aligned without micromanagement.</p>
+      <span class="card-cta">Open template →</span>
+    </a>
+
+    <a class="template-card" href="trade-off-matrix/">
+      <p class="card-tag">Decision · Matrix</p>
+      <p class="card-title">Trade-Off Matrix</p>
+      <p class="card-desc">Decision artefact for surfacing and communicating architecture trade-offs — options, criteria, weights, and the reasoning behind the chosen path.</p>
+      <span class="card-cta">Open template →</span>
+    </a>
+
+    <a class="template-card" href="pulse-briefing/">
+      <p class="card-tag">Rhythm · Governance</p>
+      <p class="card-title">Pulse Briefing</p>
+      <p class="card-desc">Cadence artefact for architecture programme governance — a concise standing update that keeps stakeholders informed without drowning them in detail.</p>
+      <span class="card-cta">Open template →</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- SHARED-FOOTER-START -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Velocity<sup>™</sup></p>
+      <p class="footer-copy">© 2026 ZenCloud Global Consultants · Free to use · Attribution appreciated</p>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/frameworks/">Framework</a>
+      <a href="/research/">Research</a>
+      <a href="/publications/">Publications</a>
+      <a href="/guides/">Guides</a>
+      <a href="/diagnostics/">Diagnostics</a>
+      <a href="/examples/">Examples</a>
+      <a href="/templates/">Templates</a>
+      <a href="/policies/">Policies</a>
+      <a href="https://velocityarchitectureframework.com/app/portal.html" target="_blank" rel="noopener">Velocity Agent ↗</a>
+    </div>
+  </div>
+</footer>
+<!-- SHARED-FOOTER-END -->
+
+</body>
+</html>
