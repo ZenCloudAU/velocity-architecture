@@ -57,4 +57,4 @@ Adding a new article: drop a `.md` file into `research/` or `publications/` and 
 This repository is proprietary. All rights are reserved. See [LICENSE](LICENSE) for the binding licensing terms, and `CONTRIBUTING.md`, `LICENCE-TERMS.md` and `SECURITY.md` for additional contribution, trademark and security terms.
 
 ---
-© 2026 ZenCloud Global Consultants. All rights reserved. Proprietary and confidential.
+© 2026 Zencloud Advisory. All rights reserved. Proprietary and confidential.
