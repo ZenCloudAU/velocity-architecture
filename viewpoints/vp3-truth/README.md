@@ -51,6 +51,23 @@ An ADR is a numbered, immutable record of a technical architectural decision. On
 **Heuristic for what counts as architectural:**  
 *If reversing this decision requires a sprint or more of rework, it is architectural. When in doubt, write it down.*
 
+### ADR Storage: Codebase vs ADL
+
+ADRs are the technical-layer instrument — they live in the codebase under `decisions/adrs/`. This is intentional: ADRs must be versioned alongside the code they govern.
+
+The Architectural Decision Log (ADL) in VP4 is a separate instrument. The ADL indexes ADR IDs and records their current status and governing Trade-off Matrix references. It does not duplicate the ADR text. The relationship is:
+
+| | ADR (VP3) | ADL/INDEX.md (VP4) |
+|--|-----------|-------------------|
+| **Location** | Codebase (`decisions/adrs/`) | ADL directory (`ADL/INDEX.md`) |
+| **Contains** | Full decision text, rationale, consequences | ADR ID, status, owner, governing TOM, date |
+| **Updated when** | A new technical decision is made or superseded | ADR status changes (opened, accepted, superseded) |
+| **Immutability** | Fixed once accepted; superseded not deleted | Living index — always current |
+
+**In practice:** you author and version an ADR in the codebase. The ADL entry records that ADR-007 exists, is in Draft status, is owned by P. Walsh, and governs TOM-20260115-002. When P. Walsh accepts the ADR, the ADL status updates to Accepted. The codebase ADR text does not change.
+
+This separation prevents the ADL from becoming a shadow documentation system. The ADL is a status board; the codebase is the record.
+
 ---
 
 ## Model Kind 2: Fitness Function
@@ -64,6 +81,8 @@ assert no_unauthorised_vendor_dependencies()
 ```
 
 Every fitness function must be traceable to at least one ADR or Trade-off Matrix that states the intent it enforces (CR-T4).
+
+Fitness function pass/fail status is reported in the Velocity Dashboard (VP4 — Component 7: Fitness Function Status). A failing fitness function in VP3 is a VP4 signal — it may invalidate upstream assumptions and must be escalated within one Pulse window (CR-L3).
 
 ---
 

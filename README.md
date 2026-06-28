@@ -4,14 +4,57 @@ This repository is the public knowledge base for Velocity Architecture. It conta
 
 **Public site:** https://velocityarchitectureframework.com/
 
+---
+
+## Framework Structure
+
+Velocity™ operates through two complementary structures. Understanding both is required before working with any artefact.
+
+### Six Viewpoints — the operational structure
+
+The framework is ISO/IEC/IEEE 42010:2022 conformant. Its operational structure is six viewpoints, each with a defined instrument, layer, and concern set.
+
+| ID  | Viewpoint    | Instrument                 | Layer      |
+|-----|--------------|----------------------------|------------|
+| VP1 | Direction    | Guardrail Canvas           | Enterprise |
+| VP2 | Decision     | Trade-off Matrix           | Solution   |
+| VP3 | Truth        | ADRs + Fitness Functions   | Technical  |
+| VP4 | Velocity     | Dashboard + ADL + Vault    | Control    |
+| VP5 | Rhythm       | Pulse System               | Operating  |
+| VP6 | Practitioner | Integrity Arc              | Human      |
+
+The viewpoints define what artefacts exist, what concerns they address, and what correspondence rules govern their relationships. See [`spec/FRAMEWORK-SPEC.md`](spec/FRAMEWORK-SPEC.md) for the full conformance declaration.
+
+### Seven Columns — the teaching and publication structure
+
+The framework is also expressed through seven columns used in the book, presentations, and practitioner training. The columns organise the same content into a practitioner sequence rather than an ISO ontology.
+
+| Column | Name                  | VP equivalent                  |
+|--------|-----------------------|--------------------------------|
+| 1      | Trademark             | Meta-level (no VP)             |
+| 2      | Operating Model       | Foundation Layer               |
+| 3      | Operating Rhythm      | VP5                            |
+| 4      | Delivery System       | VP4 (ADL + Velocity Vault)     |
+| 5      | Architectural Control | VP4 (Dashboard)                |
+| 6      | Pattern & Playbook    | VP2, VP3 (applied patterns)    |
+| 7      | Practitioner          | VP6                            |
+
+VP1, VP2, and VP3 operate across Columns 2-5 in execution — they are not assigned to a single column because decision-making spans enterprise, solution, and technical layers simultaneously.
+
+**The relationship in one sentence:** the seven columns are how the framework is taught and published; the six viewpoints are how it operates and conforms to ISO 42010.
+
+---
+
 ## Browse the knowledge base
 
 | Area | Purpose |
 |---|---|
 | `foundation/` | Foundational concepts and principles |
 | `spec/` | Formal specification and conformance material |
-| `viewpoints/` | Velocity viewpoint definitions |
+| `viewpoints/` | Velocity™ viewpoint definitions |
 | `correspondence-rules/` | Cross-viewpoint consistency rules |
+| `vault/` | Velocity Vault — the permanent decision archive |
+| `patterns/` | Architecture patterns and practitioner playbooks |
 | `frameworks/` | Framework explanations and reference material |
 | `research/` | Research papers, evidence and bibliography |
 | `guides/` | Practitioner guidance |
@@ -23,11 +66,15 @@ This repository is the public knowledge base for Velocity Architecture. It conta
 | `publications/` | Reader-facing Thought Series, Signal and book archive |
 | `book/`, `series/`, `signals-series/` | Canonical publication source |
 
+---
+
 ## Publication boundary
 
 Only material approved for public readers belongs in this repository. Commercial collateral, partner operations, internal planning, unpublished drafts, application code, deployment records, local workspace files and production notes are maintained outside the public knowledge base.
 
 Repository paths that support public URLs must be changed with corresponding navigation and compatibility updates.
+
+---
 
 ## Tooling
 
@@ -41,9 +88,33 @@ The GitHub Actions workflow (`.github/workflows/publish-articles.yml`) runs on e
 
 Adding a new article: drop a `.md` file into `research/` or `publications/` and push — the workflow handles the rest.
 
+---
+
+## Publishing Platform
+
+The primary publishing platform for all Velocity™ content is **velocityarchitectureframework.com**, not Medium.
+
+| Channel | Status | Notes |
+|---------|--------|-------|
+| [velocityarchitectureframework.com/publications](https://velocityarchitectureframework.com/publications/) | **Primary** | All 50 book chapters + Thought Series + Signal |
+| [Medium @ZencloudAU](https://medium.com/@ZencloudAU) | Secondary | Book chapters serialised — Chapter 30 of 50 |
+| [LinkedIn in/pmyint](https://www.linkedin.com/in/pmyint) | Professional | Active presence |
+
+---
+
+## Ecosystem
+
+Velocity Architecture is published alongside the **Velocity™ SA** practitioner framework — a field-level framework for solution architects.
+
+- **velocityarchitectureframework.com** — this repository, the governing framework
+- **[Velocity™ SA](https://zencloudau.github.io/vaf-sa/)** — practitioner tools, field lexicon, engagement archetypes, workshop playbook
+
+---
+
 ## Start reading
 
 - [Framework home](https://velocityarchitectureframework.com/)
+- [Velocity™ SA practitioner site](https://zencloudau.github.io/vaf-sa/)
 - [Research](https://velocityarchitectureframework.com/research/)
 - [Publications](https://velocityarchitectureframework.com/publications/)
 - [Framework documents](https://velocityarchitectureframework.com/frameworks/)
@@ -52,9 +123,10 @@ Adding a new article: drop a `.md` file into `research/` or `publications/` and 
 - [Policies](https://velocityarchitectureframework.com/policies/)
 - [Site map](https://velocityarchitectureframework.com/site-map.html)
 
+---
+
 ## Contribution and reuse
 
-This repository is proprietary. All rights are reserved. See [LICENSE](LICENSE) for the binding licensing terms, and `CONTRIBUTING.md`, `LICENCE-TERMS.md` and `SECURITY.md` for additional contribution, trademark and security terms.
+See `CONTRIBUTING.md`, `LICENSE.md`, `LICENCE-TERMS.md` and `SECURITY.md` for the applicable contribution, licensing, trademark and security terms.
 
----
-© 2026 Zencloud Advisory. All rights reserved. Proprietary and confidential.
+(c) 2026 Phil Myint / ZenCloud Advisory.

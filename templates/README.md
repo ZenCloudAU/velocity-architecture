@@ -1,50 +1,53 @@
 # Templates
 
-**Velocity Architecture Framework™ — Ready-to-use artefact templates**
-
-Copy, rename, and fill in. One file per decision or session.
+**Velocity Architecture Framework™ — Standalone Template Library**
 
 ---
 
-## Core Artefacts
+## What This Directory Is
 
-| Template | Viewpoint | Use when |
-|----------|-----------|----------|
-| [`guardrail-canvas.md`](guardrail-canvas.md) | VP1 — Direction | Declaring enterprise direction, non-negotiables, and trade-off positions |
-| [`trade-off-matrix.md`](trade-off-matrix.md) | VP2 — Decision | Making a binding solution-level decision with explicit trade-offs |
-| [`adr.md`](adr.md) | VP3 — Truth | Recording a technical architectural decision in version control |
-| [`pulse-briefing.md`](pulse-briefing.md) | VP5 — Rhythm | Preparing and running a governance Pulse session |
+This directory contains **standalone templates** — documents ready for direct use in an engagement without surrounding context.
 
----
+Each template here is also present, in context, within the relevant viewpoint directory (`viewpoints/vp*/`). The viewpoint version exists for learning and reference; it is embedded in the explanation of the instrument. The template version here is for use — clean, annotated, and ready to copy into a working engagement.
 
-## Also in This Folder
-
-| File | Notes |
-|------|-------|
-| [`ADL_TEMPLATE.md`](ADL_TEMPLATE.md) | Original one-page ADL template — superseded by [`/viewpoints/vp4-velocity/adl-template.md`](../viewpoints/vp4-velocity/adl-template.md) but retained for reference |
-| [`MASTER ARCHITECTURE DIAGRAM (ALL CONTENT)`](MASTER%20ARCHITECTURE%20DIAGRAM%20(ALL%20CONTENT)) | Full VAF domain map in Mermaid — paste into https://mermaid.live |
+**One canonical version exists per template.** If you are working from an engagement context, use the files in this directory. If you are learning how the template fits the framework, read the viewpoint directory first, then use this template.
 
 ---
 
-## How to Use
+## Template Index
 
-1. Copy the template file
-2. Rename it with the correct ID format:
-   - Canvas: `GC-YYYYMMDD-XXX.md`
-   - Trade-off Matrix: `TOM-YYYYMMDD-XXX.md`
-   - ADR: `ADR-NNN.md`
-   - Pulse Briefing: `PULSE-YYYYMMDD.md`
-3. Fill in every field — blank fields are incomplete decisions
-4. Store in your Velocity Vault (ADL) under the correct folder
+| File | Instrument | Viewpoint | Purpose |
+|------|-----------|-----------|---------|
+| `guardrail-canvas.md` | Guardrail Canvas | VP1 | Enterprise-level constraints and direction |
+| `trade-off-matrix.md` | Trade-off Matrix | VP2 | Solution-layer decision with scored options |
+| `adr.md` | Architecture Decision Record | VP3 | Technical decision record — codebase-resident |
+| `pulse-briefing.md` | Pulse Briefing | VP5 | Pre-session decision summary for the Pulse |
 
 ---
 
-## The Single Test
+## Relationship to Viewpoint Templates
 
-> **Did this help someone decide?**  
-> If not, it is not architecture.
+| Here (`templates/`) | Also in (`viewpoints/`) | Use the viewpoint version when… |
+|---------------------|------------------------|----------------------------------|
+| Standalone, annotated, use-ready | Embedded in the viewpoint README | Learning how the template fits the framework |
+| Updated here first | Links to this directory | — |
+
+Both versions should be identical in structure. If you find a discrepancy, the `templates/` version is canonical.
 
 ---
 
-*VAF Templates | © 2026 Phil Myint / ZenCloud Global Consultants*  
-*github.com/ZenCloudAU/velocity-architecture*
+## Relationship to Examples
+
+The `examples/` directory contains completed templates with realistic content:
+
+- `examples/guardrail-canvas-example.md` — GC-20260101-001
+- `examples/trade-off-matrix-example.md` — TOM-20260115-001
+- `examples/adr-example.md` — ADR-001
+- `examples/pulse-briefing-example.md` — Pulse Briefing, Cloud Platform Modernisation
+- `examples/pulse-report-example.md` — Pulse Report following the above
+- `examples/adl-example.md` — Populated ADL at Week 7
+
+---
+
+*Templates — Velocity Architecture Framework™*  
+*© 2026 Phil Myint / ZenCloud Advisory | ISO/IEC/IEEE 42010:2022 Conformant*

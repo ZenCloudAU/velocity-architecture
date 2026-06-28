@@ -1,26 +1,29 @@
-Copyright 2026 Zencloud Advisory
+SPDX-FileCopyrightText: 2026 Phil Myint / ZenCloud Advisory
+SPDX-License-Identifier: LicenseRef-ZenCloudAdvisory-Proprietary
 
+Velocity Architecture Framework™
+Copyright © 2026 Phil Myint / ZenCloud Advisory
 All rights reserved.
 
-This repository, including its source code, design system, deployment
-architecture, content, documentation, frameworks and associated
-intellectual property, is proprietary to Zencloud Advisory.
+This work — including all text, structure, instruments, coined concepts, correspondence
+rules, templates, examples, and associated publications — is the proprietary intellectual
+property of Phil Myint / ZenCloud Advisory.
 
-No part of this repository may be copied, distributed, modified,
-sublicensed, sold, reproduced, reverse engineered or used for commercial
-purposes without prior written permission from Zencloud Advisory.
+Permission is NOT granted to copy, reproduce, distribute, publish, sublicense, sell,
+or create derivative works from this material in whole or in part, whether in original
+or modified form, without the prior written permission of the copyright holder.
 
-The Velocity Architecture Framework and associated platform modules are
-protected intellectual property.
+Permitted uses (without prior written permission):
+  - Reading and referencing this material for personal or professional learning
+  - Linking to this repository from public or private content
+  - Citing this work with full attribution in academic or professional publications
 
---------------------------------------------------------------------------
-TRADEMARKS
+Trademark notice:
+  Velocity Architecture Framework™ is a trademark of ZenCloud Advisory filed in
+  Class 42. Use of the trademark or coined concepts defined in this framework
+  in any commercial product, service, or publication requires prior written
+  permission.
 
-Velocity Architecture Framework™ and Velocity Success Factor™ are
-trademarks of ZenCloud Consulting (Class 42). The trademarks are not
-licensed for use without prior written permission.
+For licensing enquiries: phil@myintenterprises.com
 
---------------------------------------------------------------------------
-CONTACT
-
-info@zencloud.com.au
+This licence does not affect any statutory rights that cannot be excluded by agreement.

@@ -53,13 +53,21 @@ ADL/
 **14-Day Decision Aging Rule:**  
 Any significant decision open for more than 14 calendar days without binding resolution triggers a mandatory escalation event (CR-E1).
 
+### ADL and ADR Relationship
+
+ADRs (Architecture Decision Records) are the technical-layer instrument of VP3. They are authored in and versioned by the codebase — the single source of truth for the technical decision text. The ADL does not duplicate ADR content. The ADL indexes each ADR by ID and records its current status, governing TOM reference, and owner. This separation is intentional: the codebase holds the decision text; the ADL holds the decision state.
+
+When an ADR is superseded, the original is retained in `superseded/` and the new ADR carries a `Supersedes: ADR-NNN` reference (CR-T3). Both the original and the supersession are indexed in the ADL.
+
+See `viewpoints/vp3-truth/README.md` for the full ADR specification.
+
 ---
 
 ## Model Kind 2: Velocity Dashboard
 
 The Velocity Dashboard is a real-time operational view of decision health. It is not a reporting tool — it is a control surface.
 
-**Required components:**
+**Seven required components:**
 
 | Component | What it shows |
 |-----------|--------------|
@@ -69,6 +77,7 @@ The Velocity Dashboard is a real-time operational view of decision health. It is
 | Heat Map (System Health) | Domains by decision health — where is ambiguity accumulating? |
 | Risk Inventory | Open risks with aging dates |
 | Risk Aging | Risks approaching or past their expiry dates |
+| Fitness Function Status | Current pass/fail state of all architectural fitness functions; VP3 signals requiring VP4 response |
 
 **Primary metric:** Decisions per week, by layer  
 **Secondary metric:** Decision latency — median days between recognition and binding resolution
@@ -91,4 +100,5 @@ The Velocity Dashboard is a real-time operational view of decision health. It is
 ## ADL Index Template
 
 → [`adl-template.md`](adl-template.md)  
-→ [`velocity-dashboard.md`](velocity-dashboard.md)
+→ [`velocity-dashboard.md`](velocity-dashboard.md)  
+→ Worked example: [`examples/adl-example.md`](../../examples/adl-example.md)
